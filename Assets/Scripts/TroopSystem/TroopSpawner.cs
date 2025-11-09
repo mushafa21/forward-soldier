@@ -7,7 +7,7 @@ namespace TroopSystem
     {
         [Header("Spawner Settings")]
         public LanePath spawnPath; // Path where troops will spawn and move along
-        public bool spawnReversedTroops = false; // If true, troops will move in reverse direction (for enemy troops)
+        public TroopFaction troopFaction = TroopFaction.Player; // Faction of the spawned troops
         
         [Header("Spawn Settings")]
         public float spawnInterval = 2f; // Time between spawns
@@ -39,19 +39,18 @@ namespace TroopSystem
         {
             if (troopPrefab != null && spawnPath != null)
             {
-                // Spawn at the start of the path
-                Vector3 spawnPosition = spawnReversedTroops ? spawnPath.GetEndPoint() : spawnPath.GetStartPoint();
-                
-                GameObject newTroopObject = Instantiate(troopPrefab, spawnPosition, Quaternion.identity);
+                // Troop position will be set by the troop's faction-based logic
+                GameObject newTroopObject = Instantiate(troopPrefab, Vector3.zero, Quaternion.identity);
                 
                 // Get the troop component and assign the path
                 Troop newTroop = newTroopObject.GetComponent<Troop>();
                 if (newTroop != null)
                 {
-                    newTroop.SetPath(spawnPath, spawnReversedTroops);
+                    newTroop.faction = troopFaction; // Set the faction
+                    newTroop.SetPath(spawnPath);
                 }
                 
-                Debug.Log($"Spawned {(spawnReversedTroops ? "enemy" : "friendly")} troop on path");
+                Debug.Log($"Spawned {troopFaction} troop on path");
             }
             else
             {
@@ -60,22 +59,6 @@ namespace TroopSystem
         }
 
         // Visualize the spawn point and path in the editor
-        private void OnDrawGizmosSelected()
-        {
-            if (spawnPath != null)
-            {
-                // Draw a line to the start or end of the path depending on direction
-                Vector3 spawnPoint = spawnReversedTroops ? spawnPath.GetEndPoint() : spawnPath.GetStartPoint();
-                Gizmos.color = spawnReversedTroops ? Color.red : Color.blue;
-                Gizmos.DrawLine(transform.position, spawnPoint);
-                Gizmos.DrawWireSphere(spawnPoint, 0.5f);
-            }
-            else
-            {
-                // Draw spawn point
-                Gizmos.color = Color.blue;
-                Gizmos.DrawWireSphere(transform.position, 0.5f);
-            }
-        }
+
     }
 }

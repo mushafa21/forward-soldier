@@ -12,6 +12,12 @@ public class TroopSO : ScriptableObject
     public float attackRange;
     public float movementSpeed;
     public float attackCooldown;
+    
+    [Header("Presentation")]
+    public AudioClip walkSound;
+    public AudioClip hitSound;
+    public AudioClip allyDeathSound;
+    public AudioClip enemyDeathSound;
 
 
 }

@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   health: 50
   damage: 10
-  attackRange: 2
+  attackRange: 1
   movementSpeed: 3
   attackCooldown: 1
+  walkSound: {fileID: 8300000, guid: a83ea3d3132e341ce9a214f6d6ff86a9, type: 3}
+  hitSound: {fileID: 8300000, guid: 7fd4a0bb348c34d6b83e244087845ee7, type: 3}
