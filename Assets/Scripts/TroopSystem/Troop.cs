@@ -135,6 +135,10 @@ namespace TroopSystem
                 moveSpeed = troopStats.movementSpeed;
                 attackRange = troopStats.attackRange;
                 attackCooldown = troopStats.attackCooldown;
+                if (troopStats.animatorController != null)
+                {
+                    animator.runtimeAnimatorController = troopStats.animatorController;
+                }
             }
             
             currentHealth = maxHealth;
@@ -930,6 +934,11 @@ namespace TroopSystem
                 // Automatically transition to walk state when a path is set
                 ChangeState(TroopState.Walk);
             }
+        }
+        
+        public void SetTroopSO(TroopSO troopSO)
+        {
+            troopStats = troopSO;
         }
 
         // Clean up when the object is destroyed

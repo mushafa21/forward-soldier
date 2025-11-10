@@ -7,7 +7,9 @@ public class TroopManager : MonoBehaviour
     [Header("Troop Management")] public List<Troop> activeTroops = new List<Troop>();
 
     private static TroopManager instance;
-
+    public TroopSO currentSelectedTroop;
+    
+    
     public static TroopManager Instance
     {
         get
@@ -93,5 +95,10 @@ public class TroopManager : MonoBehaviour
         }
 
         return pathTroops;
+    }
+
+    public void SetCurrentTroop(TroopSO troopSO)
+    {
+        currentSelectedTroop = troopSO;
     }
 }

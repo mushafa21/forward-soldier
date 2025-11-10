@@ -8,7 +8,6 @@ namespace TroopSystem
     {
         [Header("Spawner Settings")]
         public LanePath spawnPath; // Path where troops will spawn and move along
-        public TroopFaction troopFaction = TroopFaction.Player; // Faction of the spawned troops
 
         [Header("Spawn Settings")]
         public GameObject troopPrefab; // Prefab of the troop to spawn
@@ -25,7 +24,7 @@ namespace TroopSystem
         private Collider2D spawnerCollider; // Collider to detect clicks
         private SpriteRenderer spriteRenderer; // Reference to sprite renderer for visual feedback
         private Vector3 originalScale; // Store original scale
-        private Color originalColor = Color.white; // Store original color
+        private Color originalColor = Color.white; // Store original colo
 
         void Start()
         {
@@ -126,11 +125,13 @@ namespace TroopSystem
                 Troop newTroop = newTroopObject.GetComponent<Troop>();
                 if (newTroop != null)
                 {
-                    newTroop.faction = troopFaction; // Set the faction
+                    newTroop.faction = TroopFaction.Player; // Set the faction
                     newTroop.SetPath(spawnPath);
+                    if (TroopManager.Instance.currentSelectedTroop != null)
+                    {
+                        newTroop.SetTroopSO(TroopManager.Instance.currentSelectedTroop);
+                    }
                 }
-
-                Debug.Log($"Player spawned {troopFaction} troop on path via click!");
             }
             else
             {

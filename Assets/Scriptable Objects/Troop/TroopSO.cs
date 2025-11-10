@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEditor.Animations;
 using UnityEngine;
 
 
@@ -13,6 +14,8 @@ public class TroopSO : ScriptableObject
     public float movementSpeed;
     public float attackCooldown;
     public float spawnCooldown;
+    public float soulCost;
+    
 
     [Header("Presentation")] 
     public Sprite potrait;
@@ -20,6 +23,7 @@ public class TroopSO : ScriptableObject
     public AudioClip hitSound;
     public AudioClip allyDeathSound;
     public AudioClip enemyDeathSound;
+    public AnimatorOverrideController animatorController;
 
 
 }
