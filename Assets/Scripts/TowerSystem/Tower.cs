@@ -16,7 +16,6 @@ namespace TowerSystem
     {
         [Header("Tower Settings")]
         public TowerFaction faction = TowerFaction.Player;
-        public LanePath associatedPath;
         
         [Header("Tower Health")]
         public float maxHealth = 1000f;
@@ -28,6 +27,8 @@ namespace TowerSystem
         public Renderer towerRenderer;
         public Color playerColor = Color.blue;
         public Color enemyColor = Color.red;
+        public SpriteRenderer mageSprite;
+        public Material factionMaterial; // Assign your 'Troop_ColorSwap_Material' here
 
         void Start()
         {
@@ -60,17 +61,41 @@ namespace TowerSystem
         // Set the color based on faction
         void SetFactionColor()
         {
-            if (towerRenderer != null)
+            if (mageSprite == null || factionMaterial == null)
             {
-                towerRenderer.material.color = faction == TowerFaction.Player ? playerColor : enemyColor;
+                if (mageSprite == null) Debug.LogWarning($"SpriteRenderer not assigned on {gameObject.name}");
+                if (factionMaterial == null) Debug.LogWarning($"FactionMaterial not assigned on {gameObject.name}");
+                return;
             }
 
+            // Create a new instance of the material for this troop
+            // This is CRUCIAL so that changing one troop's color
+            // doesn't change all troops using the same material.
+            Material materialInstance = new Material(factionMaterial);
+            
+            // Set the sprite renderer to use this new material instance
+            mageSprite.material = materialInstance;
+
+            // Set the '_TargetColor' property on the shader
             if (faction == TowerFaction.Enemy)
             {
-                transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
-                healthText.gameObject.transform.localScale = new Vector3(-Mathf.Abs(healthText.gameObject.transform.localScale.x), healthText.gameObject.transform.localScale.y, healthText.gameObject.transform.localScale.z);
+                materialInstance.SetColor("_TargetColor", enemyColor);
+                transform.localScale = new Vector3(transform.localScale.x * -1, transform.localScale.y, transform.localScale.z);
+                healthText.gameObject.transform.localScale = new Vector3(healthText.gameObject.transform.localScale.x * -1, healthText.gameObject.transform.localScale.y, healthText.gameObject.transform.localScale.z);
+
+            }
+            else // Player
+            {
+                // For the player, we set the target color to be the same
+                // as the source color (which is set on the material asset).
+                // Or, you can set it to a specific playerColor.
+                // This ensures Player troops stay blue.
+                materialInstance.SetColor("_TargetColor", playerColor);
             }
         }
+        
+ 
+
 
         // Get the tower's health percentage
         public float GetHealthPercentage()

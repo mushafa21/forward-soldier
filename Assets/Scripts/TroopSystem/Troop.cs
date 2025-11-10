@@ -50,7 +50,7 @@ namespace TroopSystem
         public GameObject walkParticle; // Reference to the walk particle game object
         public Animator animator; // Reference to the animator (if using animations)
         public SpriteRenderer spriteRenderer; // *** ADD THIS ***
-
+        public ParticleSystem spawnParticle;
         [Header("Audio References")]
         public AudioSource audioSource; // Reference to the audio source component
         
@@ -112,6 +112,13 @@ namespace TroopSystem
                     audioSource.playOnAwake = false; // Don't play automatically
                 }
             }
+            
+            if (spawnParticle != null)
+            {
+                var main = spawnParticle.main;
+                main.simulationSpeed = 4;
+                // spawnParticle.playbackSpeed = 4;
+            }
         }
 
         // Start is called before the first frame update
@@ -169,6 +176,8 @@ namespace TroopSystem
                 // Switch to walk state after setting up the path
                 ChangeState(TroopState.Walk);
             }
+
+          
         }
 
         // *** ADD THIS NEW METHOD ***
@@ -421,9 +430,13 @@ namespace TroopSystem
                 TowerSystem.Tower closestTower = FindClosestTower();
                 if (closestTower != null)
                 {
+                    print("Tower Found " + closestTower.gameObject.name);
                     float distanceToTower = Vector3.Distance(transform.position, closestTower.transform.position);
                     // Add size compensation for larger towers
                     float effectiveTowerRange = attackRange + towerSizeCompensation;
+                    print("Distance to tower = " + distanceToTower);
+                    print("Effective tower range = " + effectiveTowerRange);
+
                     if (distanceToTower <= effectiveTowerRange)
                     {
                         targetTower = closestTower; // Set the target tower
@@ -460,7 +473,7 @@ namespace TroopSystem
             foreach (TowerSystem.Tower tower in towers)
             {
                 // Check if the tower is on the same path and of opposite faction
-                if (tower.associatedPath == currentPath && IsOppositeFactionTower(tower))
+                if (IsOppositeFactionTower(tower))
                 {
                     float distance = Vector3.Distance(transform.position, tower.transform.position);
                     
@@ -468,27 +481,6 @@ namespace TroopSystem
                     {
                         closestDistance = distance;
                         closestTower = tower;
-                    }
-                }
-                // Additional check: if tower is not associated with path but is near the end of the path
-                // This handles cases where the tower might not be perfectly associated with the path
-                // or when the tower is large and troops reach the endpoint of the path
-                else if (IsOppositeFactionTower(tower))
-                {
-                    // Check if troop has reached the end of the path and tower is near that endpoint
-                    Vector3 pathEndPoint = faction == TroopFaction.Player ? currentPath.GetEndPoint() : currentPath.GetStartPoint();
-                    float distanceToPathEnd = Vector3.Distance(transform.position, pathEndPoint);
-                    float distanceToTowerFromPathEnd = Vector3.Distance(tower.transform.position, pathEndPoint);
-                    
-                    // If troop is at the end of path and tower is also near the end of path, consider it as valid target
-                    if (distanceToPathEnd < 2.0f && distanceToTowerFromPathEnd < 3.0f)
-                    {
-                        float distanceToTower = Vector3.Distance(transform.position, tower.transform.position);
-                        if (distanceToTower < closestDistance)
-                        {
-                            closestDistance = distanceToTower;
-                            closestTower = tower;
-                        }
                     }
                 }
             }
@@ -730,15 +722,15 @@ namespace TroopSystem
             }
             
             // Look for towers at the end of the path immediately
-            CheckForTargetInRange();
+            // CheckForTargetInRange();
             
             // If a tower was found and we're in attack state, stay in attack
-            if (currentState != TroopState.Attack)
-            {
-                // If no tower is found in range, stay at idle to continue checking
-                // This allows troops to remain at the end of the path and keep checking for towers
-                ChangeState(TroopState.Idle);
-            }
+            // if (currentState != TroopState.Attack)
+            // {
+            //     // If no tower is found in range, stay at idle to continue checking
+            //     // This allows troops to remain at the end of the path and keep checking for towers
+            //     ChangeState(TroopState.Idle);
+            // }
         }
 
         // Take damage from attacks

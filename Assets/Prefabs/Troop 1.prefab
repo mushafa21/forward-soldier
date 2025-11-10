@@ -7292,15 +7292,16 @@ MonoBehaviour:
   walkParticle: {fileID: 2826998106500922648}
   animator: {fileID: 4834972624006032850}
   spriteRenderer: {fileID: 7988109957524444368}
+  spawnParticle: {fileID: 0}
   audioSource: {fileID: 0}
   factionMaterial: {fileID: 2100000, guid: 355569e01f68e4ddca7a147bb30e2d4d, type: 2}
   playerColor: {r: 0.14509805, g: 0.5882353, b: 0.74509805, a: 1}
   enemyColor: {r: 1, g: 0.2, b: 0.2, a: 1}
   deathDestroyDelay: 2
-  spawnYOffset: 0.2
+  spawnYOffset: 0
   deathZPosition: 10
   zOffsetPerYUnit: 0.1
-  towerSizeCompensation: 1
+  towerSizeCompensation: 4.6
   ghostPrefab: {fileID: 272738763551589681, guid: 4e50016193b024be0a072b5929ffeed6, type: 3}
   ghostSpawnYOffset: 0.5
 --- !u!82 &6314516077168127872

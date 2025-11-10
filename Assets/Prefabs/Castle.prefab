@@ -582,7 +582,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 355569e01f68e4ddca7a147bb30e2d4d, type: 2}
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1141,14 +1141,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   faction: 0
-  associatedPath: {fileID: 0}
   maxHealth: 100
   currentHealth: 0
   healthText: {fileID: 4953220783893438540}
   healthBar: {fileID: 5905548315755939302}
   towerRenderer: {fileID: 2738568971604795563}
-  playerColor: {r: 1, g: 1, b: 1, a: 1}
-  enemyColor: {r: 1, g: 1, b: 1, a: 1}
+  playerColor: {r: 0.14509805, g: 0.5882353, b: 0.74509805, a: 1}
+  enemyColor: {r: 1, g: 0.2, b: 0.2, a: 1}
+  mageSprite: {fileID: 4151921225964964293}
+  factionMaterial: {fileID: 2100000, guid: 355569e01f68e4ddca7a147bb30e2d4d, type: 2}
 --- !u!61 &7850615331353918983
 BoxCollider2D:
   m_ObjectHideFlags: 0
