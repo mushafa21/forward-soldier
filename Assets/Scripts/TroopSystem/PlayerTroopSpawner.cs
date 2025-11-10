@@ -28,12 +28,7 @@ namespace TroopSystem
 
         void Start()
         {
-            // If no path is assigned, try to find one automatically
-            if (spawnPath == null)
-            {
-                spawnPath = FindObjectOfType<LanePath>();
-            }
-
+            
             // Ensure the spawner has a collider for click detection
             spawnerCollider = GetComponent<Collider2D>();
             spawnerCollider.isTrigger = true; // Ensure it's a trigger

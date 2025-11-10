@@ -14,16 +14,6 @@ public class TroopManager : MonoBehaviour
     {
         get
         {
-            if (instance == null)
-            {
-                instance = FindObjectOfType<TroopManager>();
-                if (instance == null)
-                {
-                    GameObject managerObject = new GameObject("TroopManager");
-                    instance = managerObject.AddComponent<TroopManager>();
-                }
-            }
-
             return instance;
         }
     }

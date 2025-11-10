@@ -431,14 +431,21 @@ namespace TroopSystem
             // Only look for new targets if we don't already have one
             if (targetTower == null && targetTroop == null)
             {
-                TowerSystem.Tower closestTower = FindClosestTower();
+                TowerSystem.Tower closestTower;
+                if (faction == TroopFaction.Enemy)
+                {
+                    closestTower = LevelManager.Instance.playerTower;
+                }
+                else
+                {
+                    closestTower = LevelManager.Instance.enemyTower;
+                }
                 if (closestTower != null)
                 {
                     float distanceToTower = Vector3.Distance(transform.position, closestTower.transform.position);
                     // Add size compensation for larger towers
                     float effectiveTowerRange = attackRange + towerSizeCompensation;
-
-                    if (distanceToTower <= effectiveTowerRange)
+                    if (distanceToTower <= effectiveTowerRange || hasReachedEnd)
                     {
                         targetTower = closestTower; // Set the target tower
                         ChangeState(TroopState.Attack);
@@ -462,32 +469,7 @@ namespace TroopSystem
             // This method just checks and sets targets if found, doesn't change state
         }
 
-        // Find the closest tower of the opposite faction on the current path
-        TowerSystem.Tower FindClosestTower()
-        {
-            // Find all towers in the scene
-            TowerSystem.Tower[] towers = UnityEngine.Object.FindObjectsOfType<TowerSystem.Tower>();
-            
-            TowerSystem.Tower closestTower = null;
-            float closestDistance = float.MaxValue;
-            
-            foreach (TowerSystem.Tower tower in towers)
-            {
-                // Check if the tower is on the same path and of opposite faction
-                if (IsOppositeFactionTower(tower))
-                {
-                    float distance = Vector3.Distance(transform.position, tower.transform.position);
-                    
-                    if (distance < closestDistance)
-                    {
-                        closestDistance = distance;
-                        closestTower = tower;
-                    }
-                }
-            }
-            
-            return closestTower;
-        }
+        
 
         // Find the closest enemy troop of the opposite faction on the current path
         TroopSystem.Troop FindClosestEnemyTroop()
@@ -656,41 +638,50 @@ namespace TroopSystem
         {
             if (currentPath == null || currentPath.waypoints.Count == 0) return;
 
-            Vector3 direction = Vector3.zero;
+            // Vector3 direction = Vector3.zero;
+            //
+            // if (faction == TroopFaction.Enemy)
+            // {
+            //     // For enemy troops, we're going from higher index to lower index (end to start)
+            //     if (currentWaypointIndex >= 0 && currentWaypointIndex < currentPath.GetWaypointCount() - 1)
+            //     {
+            //         // Calculate direction from current index to previous index (moving backward)
+            //         direction = currentPath.GetWaypoint(currentWaypointIndex) - currentPath.GetWaypoint(currentWaypointIndex + 1);
+            //     }
+            //     else if (currentWaypointIndex == currentPath.GetWaypointCount() - 1 && currentPath.GetWaypointCount() > 1)
+            //     {
+            //         // At start of enemy path (but at the end of the waypoint array), 
+            //         // use direction from end of array to second to last
+            //         direction = currentPath.GetWaypoint(currentPath.GetWaypointCount() - 1) - 
+            //                     currentPath.GetWaypoint(currentPath.GetWaypointCount() - 2);
+            //     }
+            // }
+            // else
+            // {
+            //     // For player troops, we're going from lower index to higher index (start to end)
+            //     if (currentWaypointIndex > 0 && currentWaypointIndex < currentPath.GetWaypointCount())
+            //     {
+            //         // Calculate direction from current index to next index
+            //         direction = currentPath.GetWaypoint(currentWaypointIndex) - currentPath.GetWaypoint(currentWaypointIndex - 1);
+            //     }
+            //     else if (currentWaypointIndex == 0 && currentPath.GetWaypointCount() > 1)
+            //     {
+            //         // At start of normal path, use direction from first to second
+            //         direction = currentPath.GetWaypoint(1) - currentPath.GetWaypoint(0);
+            //     }
+            // }
 
-            if (faction == TroopFaction.Enemy)
+            Vector3 towerPosition;
+            if (faction == TroopFaction.Player)
             {
-                // For enemy troops, we're going from higher index to lower index (end to start)
-                if (currentWaypointIndex >= 0 && currentWaypointIndex < currentPath.GetWaypointCount() - 1)
-                {
-                    // Calculate direction from current index to previous index (moving backward)
-                    direction = currentPath.GetWaypoint(currentWaypointIndex) - currentPath.GetWaypoint(currentWaypointIndex + 1);
-                }
-                else if (currentWaypointIndex == currentPath.GetWaypointCount() - 1 && currentPath.GetWaypointCount() > 1)
-                {
-                    // At start of enemy path (but at the end of the waypoint array), 
-                    // use direction from end of array to second to last
-                    direction = currentPath.GetWaypoint(currentPath.GetWaypointCount() - 1) - 
-                                currentPath.GetWaypoint(currentPath.GetWaypointCount() - 2);
-                }
+                towerPosition = LevelManager.Instance.enemyTower.transform.position;
             }
             else
             {
-                // For player troops, we're going from lower index to higher index (start to end)
-                if (currentWaypointIndex > 0 && currentWaypointIndex < currentPath.GetWaypointCount())
-                {
-                    // Calculate direction from current index to next index
-                    direction = currentPath.GetWaypoint(currentWaypointIndex) - currentPath.GetWaypoint(currentWaypointIndex - 1);
-                }
-                else if (currentWaypointIndex == 0 && currentPath.GetWaypointCount() > 1)
-                {
-                    // At start of normal path, use direction from first to second
-                    direction = currentPath.GetWaypoint(1) - currentPath.GetWaypoint(0);
-                }
+                towerPosition = LevelManager.Instance.playerTower.transform.position;
             }
-
             // Flip based on x component of direction
-            if (direction.x < 0) // Moving left
+            if (towerPosition.x < transform.position.x) // Moving left
             {
                 // Flip the x scale to face left
                 transform.localScale = new Vector3(-Mathf.Abs(originalScaleX), transform.localScale.y, transform.localScale.z);
@@ -699,7 +690,7 @@ namespace TroopSystem
                     walkParticle.transform.localScale = new Vector3(-Mathf.Abs(originalParticleScaleX), walkParticle.transform.localScale.y, walkParticle.transform.localScale.z);
                 }
             }
-            else if (direction.x > 0) // Moving right
+            else if (towerPosition.x > transform.position.x) // Moving right
             {
                 // Keep normal x scale to face right
                 transform.localScale = new Vector3(Mathf.Abs(originalScaleX), transform.localScale.y, transform.localScale.z);
@@ -873,10 +864,9 @@ namespace TroopSystem
                         float distanceToTower = Vector3.Distance(transform.position, targetTower.transform.position);
                         // Add size compensation for larger towers
                         float effectiveTowerRange = attackRange + towerSizeCompensation;
-                        if (distanceToTower <= effectiveTowerRange)
+                        if (distanceToTower <= effectiveTowerRange || hasReachedEnd)
                         {
                             targetTower.TakeDamage(damage);
-                            Debug.Log($"Troop dealt {damage} damage to {(targetTower.faction == TowerSystem.TowerFaction.Player ? "Player" : "Enemy")} tower!");
                         }
                     }
                 }
@@ -889,7 +879,6 @@ namespace TroopSystem
                         if (distanceToTroop <= attackRange)
                         {
                             targetTroop.TakeDamage(damage);
-                            Debug.Log($"Troop dealt {damage} damage to {(targetTroop.faction == TroopFaction.Player ? "Player" : "Enemy")} troop!");
                         }
                     }
                 }

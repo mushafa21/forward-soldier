@@ -57,7 +57,6 @@ public class CloudShadowGenerator : MonoBehaviour
         // Limit the number of clouds for performance
         if (activeClouds.Count >= maxClouds)
         {
-            Debug.LogWarning("CloudShadowGenerator: Maximum cloud count reached, skipping spawn.");
             return;
         }
 
@@ -83,7 +82,6 @@ public class CloudShadowGenerator : MonoBehaviour
         // Add to active clouds list
         activeClouds.Add(cloud);
 
-        Debug.Log($"Spawned a cloud at position: ({randomX:F2}, {randomY:F2})");
     }
 
     void MoveClouds()

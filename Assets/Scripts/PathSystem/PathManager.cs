@@ -14,15 +14,6 @@ namespace PathSystem
         {
             get
             {
-                if (instance == null)
-                {
-                    instance = FindObjectOfType<PathManager>();
-                    if (instance == null)
-                    {
-                        GameObject managerObject = new GameObject("PathManager");
-                        instance = managerObject.AddComponent<PathManager>();
-                    }
-                }
                 return instance;
             }
         }

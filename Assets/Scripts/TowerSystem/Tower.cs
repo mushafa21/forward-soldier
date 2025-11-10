@@ -80,8 +80,8 @@ namespace TowerSystem
             if (faction == TowerFaction.Enemy)
             {
                 materialInstance.SetColor("_TargetColor", enemyColor);
-                transform.localScale = new Vector3(transform.localScale.x * -1, transform.localScale.y, transform.localScale.z);
-                healthText.gameObject.transform.localScale = new Vector3(healthText.gameObject.transform.localScale.x * -1, healthText.gameObject.transform.localScale.y, healthText.gameObject.transform.localScale.z);
+                mageSprite.gameObject.transform.localScale = new Vector3(mageSprite.gameObject.transform.localScale.x * -1, mageSprite.gameObject.transform.localScale.y, mageSprite.gameObject.transform.localScale.z);
+                towerRenderer.gameObject.transform.localScale = new Vector3(towerRenderer.gameObject.transform.localScale.x * -1, towerRenderer.gameObject.transform.localScale.y, towerRenderer.gameObject.transform.localScale.z);
 
             }
             else // Player
