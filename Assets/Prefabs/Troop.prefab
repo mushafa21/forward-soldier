@@ -7298,7 +7298,7 @@ MonoBehaviour:
   playerColor: {r: 0.14509805, g: 0.5882353, b: 0.74509805, a: 1}
   enemyColor: {r: 1, g: 0.2, b: 0.2, a: 1}
   deathDestroyDelay: 2
-  spawnYOffset: 0
+  spawnYOffset: 0.3
   deathZPosition: 10
   zOffsetPerYUnit: 0.1
   towerSizeCompensation: 1

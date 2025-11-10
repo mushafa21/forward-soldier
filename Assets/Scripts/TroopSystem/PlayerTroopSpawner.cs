@@ -1,5 +1,6 @@
 using UnityEngine;
 using PathSystem;
+using SoulSystem;
 using UnityEngine.EventSystems;
 
 namespace TroopSystem
@@ -43,15 +44,7 @@ namespace TroopSystem
             originalScale = transform.localScale;
         }
 
-        void Update()
-        {
-            // Allow spawning via keyboard key as well
-            if (Input.GetKeyDown(activationKey))
-            {
-                TrySpawnTroop();
-            }
-        }
-
+    
         // Public method to manually spawn a troop via UI click
         public void OnPointerClick(PointerEventData eventData)
         {
@@ -97,6 +90,16 @@ namespace TroopSystem
         {
             if (Time.time - lastSpawnTime >= spawnCooldown)
             {
+                if (TroopManager.Instance.currentSelectedTroop != null)
+                {
+                    if (TroopManager.Instance.currentSelectedTroop.soulCost < SoulManager.Instance.GetSouls())
+                    {
+                        SoulManager.Instance.DecreaseSouls(TroopManager.Instance.currentSelectedTroop.soulCost);
+                        SpawnTroop();
+                        lastSpawnTime = Time.time;
+                        return;
+                    }
+                }
                 SpawnTroop();
                 lastSpawnTime = Time.time;
             }

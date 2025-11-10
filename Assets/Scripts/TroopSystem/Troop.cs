@@ -250,30 +250,21 @@ namespace TroopSystem
         // Calculate Y position offset to prevent visual stacking with other troops on the same path
         void CalculateYPositionOffset()
         {
-            // Get all troops on the same path to determine offset
-            List<Troop> pathTroops = TroopManager.Instance.GetTroopsByPath(currentPath);
-            
-            // Count how many troops of the same faction are already on this path
-            int troopCount = 0;
-            foreach (Troop troop in pathTroops)
+            // Apply the offset based on the last spawn state on this path
+            switch (currentPath.lastSpawnState)
             {
-                if (troop != null && troop.faction == faction && troop != this)
-                {
-                    troopCount++;
-                }
-            }
-            
-            // Calculate offset that can go both up and down
-            // Use alternating pattern to spread troops above and below the center line
-            if (troopCount % 2 == 0)
-            {
-                // Even-numbered troops go up
-                yPositionOffset = (troopCount / 2 + 1) * spawnYOffset;
-            }
-            else
-            {
-                // Odd-numbered troops go down
-                yPositionOffset = -(troopCount / 2 + 1) * spawnYOffset;
+                case PathSystem.TroopSpawnState.Center:
+                    yPositionOffset = 0f; // Center position
+                    currentPath.lastSpawnState = PathSystem.TroopSpawnState.Up; // Next troop goes up
+                    break;
+                case PathSystem.TroopSpawnState.Up:
+                    yPositionOffset = spawnYOffset; // Up position
+                    currentPath.lastSpawnState = PathSystem.TroopSpawnState.Down; // Next troop goes down
+                    break;
+                case PathSystem.TroopSpawnState.Down:
+                    yPositionOffset = -spawnYOffset; // Down position
+                    currentPath.lastSpawnState = PathSystem.TroopSpawnState.Center; // Next troop goes center
+                    break;
             }
             
             // Apply the offset to the current position
@@ -579,11 +570,15 @@ namespace TroopSystem
                 {
                     Vector3 targetWaypoint = currentPath.GetWaypoint(currentWaypointIndex);
                     
-                    // Move towards the target waypoint
-                    transform.position = Vector3.MoveTowards(transform.position, targetWaypoint, moveSpeed * Time.deltaTime);
+                    // Move towards the target waypoint while preserving the Y offset
+                    Vector3 targetPosition = targetWaypoint;
+                    targetPosition.y += yPositionOffset; // Add the Y offset to maintain visual stacking prevention
+                    targetPosition.z += yPositionOffset * zOffsetPerYUnit; // Also preserve Z offset for depth
+
+                    transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
                     
-                    // Check if we've reached the waypoint
-                    if (Vector3.Distance(transform.position, targetWaypoint) < 0.1f)
+                    // Check if we've reached the waypoint (using the offset-adjusted position for distance check)
+                    if (Vector3.Distance(transform.position, targetPosition) < 0.1f)
                     {
                         currentWaypointIndex--;
                         
@@ -609,11 +604,15 @@ namespace TroopSystem
                 {
                     Vector3 targetWaypoint = currentPath.GetWaypoint(currentWaypointIndex);
                     
-                    // Move towards the target waypoint
-                    transform.position = Vector3.MoveTowards(transform.position, targetWaypoint, moveSpeed * Time.deltaTime);
+                    // Move towards the target waypoint while preserving the Y offset
+                    Vector3 targetPosition = targetWaypoint;
+                    targetPosition.y += yPositionOffset; // Add the Y offset to maintain visual stacking prevention
+                    targetPosition.z += yPositionOffset * zOffsetPerYUnit; // Also preserve Z offset for depth
+
+                    transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
                     
-                    // Check if we've reached the waypoint
-                    if (Vector3.Distance(transform.position, targetWaypoint) < 0.1f)
+                    // Check if we've reached the waypoint (using the offset-adjusted position for distance check)
+                    if (Vector3.Distance(transform.position, targetPosition) < 0.1f)
                     {
                         currentWaypointIndex++;
                         

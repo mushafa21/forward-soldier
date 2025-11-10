@@ -3,6 +3,13 @@ using UnityEngine;
 
 namespace PathSystem
 {
+    public enum TroopSpawnState
+    {
+        Center,
+        Up,
+        Down
+    }
+
     public class LanePath : MonoBehaviour
     {
         [Tooltip("The waypoints that define this path - troops will follow these in order")]
@@ -13,6 +20,9 @@ namespace PathSystem
         
         [Tooltip("Color for gizmos in the Scene view")]
         public Color gizmoColor = Color.green;
+
+        // Track the last spawn position state for this path
+        public TroopSpawnState lastSpawnState = TroopSpawnState.Center;
 
         // Get the starting position of the path
         public Vector3 GetStartPoint()
