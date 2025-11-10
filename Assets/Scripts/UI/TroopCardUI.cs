@@ -18,6 +18,7 @@ public class TroopCardUI : MonoBehaviour
 
     void SelectTroop()
     {
+        print("Select Troop Called");
         TroopManager.Instance.SetCurrentTroop(troopSO);
     }
 
