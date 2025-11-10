@@ -127,6 +127,7 @@ namespace TroopSystem
                 {
                     newTroop.faction = TroopFaction.Player; // Set the faction
                     newTroop.SetPath(spawnPath);
+                    print("Current Selected Troop = " + TroopManager.Instance.currentSelectedTroop);
                     if (TroopManager.Instance.currentSelectedTroop != null)
                     {
                         newTroop.SetTroopSO(TroopManager.Instance.currentSelectedTroop);

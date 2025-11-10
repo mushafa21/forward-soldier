@@ -434,12 +434,9 @@ namespace TroopSystem
                 TowerSystem.Tower closestTower = FindClosestTower();
                 if (closestTower != null)
                 {
-                    print("Tower Found " + closestTower.gameObject.name);
                     float distanceToTower = Vector3.Distance(transform.position, closestTower.transform.position);
                     // Add size compensation for larger towers
                     float effectiveTowerRange = attackRange + towerSizeCompensation;
-                    print("Distance to tower = " + distanceToTower);
-                    print("Effective tower range = " + effectiveTowerRange);
 
                     if (distanceToTower <= effectiveTowerRange)
                     {
@@ -939,6 +936,15 @@ namespace TroopSystem
         public void SetTroopSO(TroopSO troopSO)
         {
             troopStats = troopSO;
+            maxHealth = troopStats.health;
+            damage = troopStats.damage;
+            moveSpeed = troopStats.movementSpeed;
+            attackRange = troopStats.attackRange;
+            attackCooldown = troopStats.attackCooldown;
+            if (troopStats.animatorController != null)
+            {
+                animator.runtimeAnimatorController = troopStats.animatorController;
+            }
         }
 
         // Clean up when the object is destroyed
