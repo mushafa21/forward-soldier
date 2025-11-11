@@ -2,6 +2,7 @@ using UnityEngine;
 using PathSystem;
 using System.Collections.Generic;
 using MoreMountains.Tools;
+using SoulSystem;
 
 namespace TroopSystem
 {
@@ -845,6 +846,13 @@ namespace TroopSystem
                     if(animator != null && animator.runtimeAnimatorController != null) animator.SetTrigger("Death");
                     animator.SetBool("IsWalking",false);
                     StopWalkSound(); // Stop walk sound when entering death state
+                    if (faction == TroopFaction.Player)
+                    {
+                        
+                    } else if (faction == TroopFaction.Enemy)
+                    {
+                        SoulManager.Instance.IncreaseSouls(troopStats.soulGainedWhenDefeated);
+                    }
                     break;
             }
         }

@@ -10,6 +10,7 @@ namespace SoulSystem
         public float intervalTime = 5f;      // Time in seconds between each soul addition
 
         private float souls = 0f;
+        public float maxSouls = 100f;
         private float timeSinceLastAddition = 0f;
         
             
@@ -39,7 +40,7 @@ namespace SoulSystem
 
         private void Start()
         {
-            UIManager.Instance.UpdateSoulText(souls);
+            UIManager.Instance.UpdateSoulText(souls,maxSouls);
         }
 
         void Update()
@@ -48,23 +49,27 @@ namespace SoulSystem
 
             if (timeSinceLastAddition >= intervalTime)
             {
-                IncreaseSouls();
+                IncreaseSouls(soulsPerInterval);
             }
         }
 
 
-        void IncreaseSouls()
+        public void IncreaseSouls(float amount)
         {
-            souls += soulsPerInterval;
+            if (souls < maxSouls)
+            {
+                souls = Math.Min(souls + amount, maxSouls);
+            }
+            
             timeSinceLastAddition = 0f;  // Reset the timer
-            UIManager.Instance.UpdateSoulText(souls);
+            UIManager.Instance.UpdateSoulText(souls,maxSouls);
         }
 
 
         public void DecreaseSouls(float amount)
         {
             souls -= amount;
-            UIManager.Instance.UpdateSoulText(souls);
+            UIManager.Instance.UpdateSoulText(souls,maxSouls);
         }
 
         // Public method to get the current soul count

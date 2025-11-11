@@ -1642,7 +1642,7 @@ MonoBehaviour:
     - rid: 4596503409475977287
       type: {class: MMF_Sound, ns: MoreMountains.Feedbacks, asm: MoreMountains.Tools}
       data:
-        Active: 1
+        Active: 0
         UniqueID: -820542727
         Label: Sound
         OriginalLabel: Sound
@@ -1845,7 +1845,7 @@ MonoBehaviour:
         Mode: 0
         Duration: 0.4
         AllowAdditivePlays: 0
-        ModifyColor: 1
+        ModifyColor: 0
         ColorOverTime:
           serializedVersion: 2
           key0: {r: 0.60784316, g: 0.74509805, b: 0, a: 1}
@@ -1959,7 +1959,7 @@ MonoBehaviour:
         Mode: 0
         Duration: 0.2
         AllowAdditivePlays: 0
-        ModifyColor: 1
+        ModifyColor: 0
         ColorOverTime:
           serializedVersion: 2
           key0: {r: 1, g: 1, b: 1, a: 1}
@@ -1998,7 +1998,7 @@ MonoBehaviour:
     - rid: 4596503409475977291
       type: {class: MMF_SpringFloat, ns: MoreMountains.Feedbacks, asm: MoreMountains.Tools}
       data:
-        Active: 1
+        Active: 0
         UniqueID: 1605770638
         Label: Spring Float Lens Distortion
         OriginalLabel: Spring Float
@@ -2083,7 +2083,7 @@ MonoBehaviour:
     - rid: 4596503409475977292
       type: {class: MMF_SquashAndStretchSpring, ns: MoreMountains.Feedbacks, asm: MoreMountains.Tools}
       data:
-        Active: 1
+        Active: 0
         UniqueID: -6041523
         Label: Squash and Stretch Spring
         OriginalLabel: Squash and Stretch Spring
@@ -2194,7 +2194,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   activeTroops: []
+  selectableTroops:
+  - {fileID: 11400000, guid: 3467a60b4e19b48139a925c8128b0709, type: 2}
+  - {fileID: 11400000, guid: 611dff7e1ef934cf99405690e4ed82a3, type: 2}
+  troopCardPrefab: {fileID: 6044060424830333802, guid: 1ca47b67be2614bc4b333e6a650cf4c0, type: 3}
   currentSelectedTroop: {fileID: 0}
+  troopCardContainer: {fileID: 748938245}
 --- !u!4 &312709620
 Transform:
   m_ObjectHideFlags: 0
@@ -2205,37 +2210,6 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 13.544637, y: -2.1460469, z: -0.008762761}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &350086341
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 350086342}
-  m_Layer: 0
-  m_Name: Soul Manager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &350086342
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 350086341}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 733.30054, y: 270.1335, z: 0.22330591}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2520,9 +2494,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1417589817be2408bb5a3924f3b2faf2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spawnPath: {fileID: 1038934588}
+  spawnPath: {fileID: 272769075}
   troopFaction: 1
-  spawnInterval: 5
+  spawnInterval: 8
   troopPrefab: {fileID: 5725314341104220098, guid: d847688718f954a43b0acc0f3f6d1ee4, type: 3}
 --- !u!4 &486424059
 Transform:
@@ -2587,6 +2561,62 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 22.57, y: -1.5940858, z: 0.023259137}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &504202169
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 504202171}
+  - component: {fileID: 504202170}
+  m_Layer: 0
+  m_Name: Enemy Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &504202170
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 504202169}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02fc0fb52087f4f1caf46cb7769e5a7d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  soulRegenAmount: 5
+  soulRegenInterval: 2
+  maxSouls: 50
+  troopPrefab: {fileID: 5725314341104220098, guid: d847688718f954a43b0acc0f3f6d1ee4, type: 3}
+  spawnPaths:
+  - {fileID: 1518463174}
+  - {fileID: 1038934588}
+  - {fileID: 272769075}
+  spawnableTroops:
+  - {fileID: 11400000, guid: 611dff7e1ef934cf99405690e4ed82a3, type: 2}
+  - {fileID: 11400000, guid: 3467a60b4e19b48139a925c8128b0709, type: 2}
+  spawnDecisionInterval: 2
+--- !u!4 &504202171
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 504202169}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2931,9 +2961,9 @@ RectTransform:
   - {fileID: 631698744}
   m_Father: {fileID: 1573523674}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -541.3644, y: -420}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: -541.3644, y: 146}
   m_SizeDelta: {x: 680.3687, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &748938247
@@ -3222,8 +3252,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spawnPath: {fileID: 1038934588}
   troopFaction: 1
-  spawnInterval: 3
-  troopPrefab: {fileID: 5725314341104220098, guid: 00b60dd55f58b404cba87ebf6e3ac0c8, type: 3}
+  spawnInterval: 8
+  troopPrefab: {fileID: 5725314341104220098, guid: d847688718f954a43b0acc0f3f6d1ee4, type: 3}
 --- !u!4 &877475426
 Transform:
   m_ObjectHideFlags: 0
@@ -3570,9 +3600,9 @@ RectTransform:
   - {fileID: 51109738}
   m_Father: {fileID: 1573523674}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 116, y: -800}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: -844, y: 332}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1038934586
@@ -3854,7 +3884,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spawnPath: {fileID: 1518463174}
   troopPrefab: {fileID: 5725314341104220098, guid: d847688718f954a43b0acc0f3f6d1ee4, type: 3}
-  spawnCooldown: 1
   activationKey: 32
   changeColorOnHover: 1
   normalColor: {r: 1, g: 1, b: 1, a: 1}
@@ -4168,7 +4197,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spawnPath: {fileID: 1518463174}
   troopFaction: 1
-  spawnInterval: 5
+  spawnInterval: 8
   troopPrefab: {fileID: 5725314341104220098, guid: d847688718f954a43b0acc0f3f6d1ee4, type: 3}
 --- !u!4 &1233087337
 Transform:
@@ -4551,7 +4580,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spawnPath: {fileID: 272769075}
   troopPrefab: {fileID: 5725314341104220098, guid: d847688718f954a43b0acc0f3f6d1ee4, type: 3}
-  spawnCooldown: 1
   activationKey: 32
   changeColorOnHover: 1
   normalColor: {r: 1, g: 1, b: 1, a: 1}
@@ -21992,6 +22020,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   soulText: {fileID: 51109739}
+  soulBar: {fileID: 216966347}
 --- !u!1001 &1612770556
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -22265,7 +22294,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spawnPath: {fileID: 1038934588}
   troopPrefab: {fileID: 5725314341104220098, guid: d847688718f954a43b0acc0f3f6d1ee4, type: 3}
-  spawnCooldown: 1
   activationKey: 32
   changeColorOnHover: 1
   normalColor: {r: 1, g: 1, b: 1, a: 1}
@@ -22579,7 +22607,7 @@ MonoBehaviour:
         Mode: 0
         Duration: 0.2
         AllowAdditivePlays: 0
-        ModifyColor: 1
+        ModifyColor: 0
         ColorOverTime:
           serializedVersion: 2
           key0: {r: 1, g: 1, b: 1, a: 1}
@@ -22618,7 +22646,7 @@ MonoBehaviour:
     - rid: 1779414934241935544
       type: {class: MMF_Sound, ns: MoreMountains.Feedbacks, asm: MoreMountains.Tools}
       data:
-        Active: 1
+        Active: 0
         UniqueID: -968316917
         Label: Sound
         OriginalLabel: Sound
@@ -22746,7 +22774,7 @@ MonoBehaviour:
     - rid: 1779414934241935549
       type: {class: MMF_RotationSpring, ns: MoreMountains.Feedbacks, asm: MoreMountains.Tools}
       data:
-        Active: 1
+        Active: 0
         UniqueID: -770892255
         Label: Rotation Spring
         OriginalLabel: Rotation Spring
@@ -22834,7 +22862,7 @@ MonoBehaviour:
     - rid: 4596503409475977284
       type: {class: MMF_ChromaticAberration_URP, ns: MoreMountains.FeedbacksForThirdParty, asm: MoreMountains.Tools}
       data:
-        Active: 1
+        Active: 0
         UniqueID: -2065759591
         Label: Chromatic Aberration URP
         OriginalLabel: Chromatic Aberration URP
@@ -22947,7 +22975,7 @@ MonoBehaviour:
     - rid: 4596503409475977285
       type: {class: MMF_Bloom_URP, ns: MoreMountains.FeedbacksForThirdParty, asm: MoreMountains.Tools}
       data:
-        Active: 1
+        Active: 0
         UniqueID: 1285901246
         Label: Bloom URP
         OriginalLabel: Bloom URP
@@ -26684,7 +26712,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   soulsPerInterval: 5
-  intervalTime: 1
+  intervalTime: 2
+  maxSouls: 50
 --- !u!4 &2108483809
 Transform:
   m_ObjectHideFlags: 0
@@ -27102,7 +27131,6 @@ SceneRoots:
   - {fileID: 1451937476}
   - {fileID: 495265126}
   - {fileID: 838904403}
-  - {fileID: 350086342}
   - {fileID: 980226694}
   - {fileID: 1397310213}
   - {fileID: 2108483809}
@@ -27115,3 +27143,4 @@ SceneRoots:
   - {fileID: 1312302494}
   - {fileID: 2118661600}
   - {fileID: 1132697094}
+  - {fileID: 504202171}

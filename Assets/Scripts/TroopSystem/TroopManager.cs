@@ -7,7 +7,11 @@ public class TroopManager : MonoBehaviour
     [Header("Troop Management")] public List<Troop> activeTroops = new List<Troop>();
 
     private static TroopManager instance;
-    public TroopSO currentSelectedTroop;
+    public List<TroopSO> selectableTroops = new List<TroopSO>();
+    public GameObject troopCardPrefab;
+    private List<TroopCardUI> _troopCards;
+    public TroopCardUI currentSelectedTroop;
+    public GameObject troopCardContainer;
     
     
     public static TroopManager Instance
@@ -28,6 +32,30 @@ public class TroopManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
+        }
+    }
+
+    private void Start()
+    {
+        _troopCards = new List<TroopCardUI>();
+        
+        // Clear all existing troop card children
+        foreach (Transform child in troopCardContainer.transform)
+        {
+            Destroy(child.gameObject);
+        }
+        
+        // Create troop cards based on selectableTroops
+        foreach (TroopSO troopSO in selectableTroops)
+        {
+            GameObject troopCardObj = Instantiate(troopCardPrefab, troopCardContainer.transform);
+            TroopCardUI troopCardUI = troopCardObj.GetComponent<TroopCardUI>();
+            
+            if (troopCardUI != null)
+            {
+                troopCardUI.SetTroop(troopSO);
+                _troopCards.Add(troopCardUI);
+            }
         }
     }
 
@@ -87,8 +115,46 @@ public class TroopManager : MonoBehaviour
         return pathTroops;
     }
 
-    public void SetCurrentTroop(TroopSO troopSO)
+    public void SetCurrentTroop(TroopCardUI troopCard)
     {
-        currentSelectedTroop = troopSO;
+        currentSelectedTroop = troopCard;
+        
+        // Deselect all troop cards
+        foreach (TroopCardUI card in _troopCards)
+        {
+            if (card != null)
+            {
+                card.Deselect();
+            }
+        }
+        
+        // Select the current troop card
+        if (troopCard != null)
+        {
+            troopCard.Select();
+        }
+    }
+
+    private void Update()
+    {
+        // Handle keyboard shortcuts for troop selection (1-9 keys)
+        for (int i = 0; i < 9; i++)
+        {
+            if (Input.GetKeyDown(KeyCode.Alpha1 + i)) // KeyCode.Alpha1 to KeyCode.Alpha9
+            {
+                SelectTroopByIndex(i);
+                break;
+            }
+        }
+    }
+
+    private void SelectTroopByIndex(int index)
+    {
+        // Check if the index is within the bounds of the _troopCards list
+        if (index >= 0 && index < _troopCards.Count && _troopCards[index] != null)
+        {
+            SetCurrentTroop(_troopCards[index]);
+        }
+        // If index is out of bounds or the troop card is null, do nothing
     }
 }

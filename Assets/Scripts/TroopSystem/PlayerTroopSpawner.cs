@@ -12,7 +12,6 @@ namespace TroopSystem
 
         [Header("Spawn Settings")]
         public GameObject troopPrefab; // Prefab of the troop to spawn
-        public float spawnCooldown = 1f; // Cooldown between spawns to prevent spam clicking
         public KeyCode activationKey = KeyCode.Space; // Optional keyboard key to trigger spawn
 
         [Header("Visual Feedback")]
@@ -21,7 +20,7 @@ namespace TroopSystem
         public Color hoverColor = Color.yellow; // Color when mouse hovers
         public float hoverScaleMultiplier = 1.1f; // Scale multiplier when hovered
 
-        private float lastSpawnTime = 0f;
+        
         private Collider2D spawnerCollider; // Collider to detect clicks
         private SpriteRenderer spriteRenderer; // Reference to sprite renderer for visual feedback
         private Vector3 originalScale; // Store original scale
@@ -88,26 +87,29 @@ namespace TroopSystem
         // Try to spawn a troop, respecting cooldown
         private void TrySpawnTroop()
         {
-            if (Time.time - lastSpawnTime >= spawnCooldown)
+            // Check if there's a selected troop
+            if (TroopManager.Instance.currentSelectedTroop == null)
             {
-                if (TroopManager.Instance.currentSelectedTroop != null)
-                {
-                    if (TroopManager.Instance.currentSelectedTroop.soulCost < SoulManager.Instance.GetSouls())
-                    {
-                        SoulManager.Instance.DecreaseSouls(TroopManager.Instance.currentSelectedTroop.soulCost);
-                        SpawnTroop();
-                        lastSpawnTime = Time.time;
-                        return;
-                    }
-                }
+                Debug.Log("No troop selected for spawning.");
+                return;
+            }
+            
+            // Check if the selected troop is on cooldown
+            if (TroopManager.Instance.currentSelectedTroop.isInCooldown)
+            {
+                Debug.Log("Selected troop is on cooldown.");
+                return;
+            }
+            
+            // Check if player has enough souls to spawn the selected troop
+            if (TroopManager.Instance.currentSelectedTroop.troopSO.soulCost <= SoulManager.Instance.GetSouls())
+            {
+                SoulManager.Instance.DecreaseSouls(TroopManager.Instance.currentSelectedTroop.troopSO.soulCost);
                 SpawnTroop();
-                lastSpawnTime = Time.time;
             }
             else
             {
-                // Optional: provide feedback that cooldown is still active
-                float remainingCooldown = spawnCooldown - (Time.time - lastSpawnTime);
-                Debug.Log($"Spawner is on cooldown. Wait {remainingCooldown:F1} more seconds.");
+                Debug.Log("Not enough souls to spawn selected troop.");
             }
         }
 
@@ -128,7 +130,8 @@ namespace TroopSystem
                     print("Current Selected Troop = " + TroopManager.Instance.currentSelectedTroop);
                     if (TroopManager.Instance.currentSelectedTroop != null)
                     {
-                        newTroop.SetTroopSO(TroopManager.Instance.currentSelectedTroop);
+                        newTroop.SetTroopSO(TroopManager.Instance.currentSelectedTroop.troopSO);
+                        TroopManager.Instance.currentSelectedTroop.StartCooldown();
                     }
                 }
             }

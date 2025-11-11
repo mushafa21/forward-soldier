@@ -1,4 +1,5 @@
 using System;
+using MoreMountains.Tools;
 using TMPro;
 using TowerSystem;
 using UnityEngine;
@@ -7,6 +8,7 @@ public class UIManager : MonoBehaviour
 {
     
     public TextMeshProUGUI soulText;
+    public MMProgressBar soulBar;
 
     
     private static UIManager instance;
@@ -33,8 +35,9 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public void UpdateSoulText(float amount)
+    public void UpdateSoulText(float amount, float maxAmount)
     {
-        soulText.text = amount.ToString();
+        soulText.text = amount + "/" + maxAmount;
+        soulBar.UpdateBar(amount,0,maxAmount);
     }
 }

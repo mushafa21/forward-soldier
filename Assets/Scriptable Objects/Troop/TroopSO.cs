@@ -15,7 +15,8 @@ public class TroopSO : ScriptableObject
     public float attackCooldown;
     public float spawnCooldown;
     public float soulCost;
-    
+    public float soulGainedWhenDefeated;
+
 
     [Header("Presentation")] 
     public Sprite potrait;
