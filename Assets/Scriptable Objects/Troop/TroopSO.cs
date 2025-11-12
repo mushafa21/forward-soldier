@@ -12,6 +12,7 @@ public class TroopSO : ScriptableObject
     public float damage;
     public float attackRange;
     public float movementSpeed;
+    public string speedCategory;
     public float attackCooldown;
     public float spawnCooldown;
     public float soulCost;
@@ -21,6 +22,7 @@ public class TroopSO : ScriptableObject
 
 
     [Header("Presentation")] 
+    public string name;
     public Sprite potrait;
     public AudioClip walkSound;
     public AudioClip hitSound;
@@ -28,5 +30,14 @@ public class TroopSO : ScriptableObject
     public AudioClip enemyDeathSound;
     public AnimatorOverrideController animatorController;
 
+    // Method to calculate stats for a specific level
+    public float GetHealthAtLevel(int level)
+    {
+        return health * Mathf.Pow(1.1f, level - 1);
+    }
 
+    public float GetDamageAtLevel(int level)
+    {
+        return damage * Mathf.Pow(1.1f, level - 1);
+    }
 }

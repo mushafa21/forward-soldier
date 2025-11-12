@@ -19,12 +19,14 @@ namespace TroopSystem
         public Color normalColor = Color.white; // Normal color
         public Color hoverColor = Color.yellow; // Color when mouse hovers
         public float hoverScaleMultiplier = 1.1f; // Scale multiplier when hovered
+        public GameObject spawnEffect;
 
         
         private Collider2D spawnerCollider; // Collider to detect clicks
         private SpriteRenderer spriteRenderer; // Reference to sprite renderer for visual feedback
         private Vector3 originalScale; // Store original scale
         private Color originalColor = Color.white; // Store original colo
+        
 
         void Start()
         {
@@ -131,8 +133,14 @@ namespace TroopSystem
                     if (TroopManager.Instance.currentSelectedTroop != null)
                     {
                         newTroop.SetTroopSO(TroopManager.Instance.currentSelectedTroop.troopSO);
+                        newTroop.level = TroopManager.Instance.currentSelectedTroop.currentLevel; // Set the troop level
                         TroopManager.Instance.currentSelectedTroop.StartCooldown();
                     }
+                }
+
+                if (spawnEffect != null)
+                {
+                    Instantiate(spawnEffect,transform.position,Quaternion.identity);
                 }
             }
             else

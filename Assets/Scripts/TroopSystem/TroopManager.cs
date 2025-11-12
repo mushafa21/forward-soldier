@@ -2,12 +2,23 @@ using UnityEngine;
 using System.Collections.Generic;
 using TroopSystem;
 
+
+[System.Serializable]
+public class TroopLevel
+{
+    public int level;
+    public TroopSO troopSO;
+}
+
 public class TroopManager : MonoBehaviour
 {
     [Header("Troop Management")] public List<Troop> activeTroops = new List<Troop>();
+    
+    [Header("Shop Settings")]
+    public int maxSelectableTroops = 5; // Maximum number of troops that can be in the shop
 
     private static TroopManager instance;
-    public List<TroopSO> selectableTroops = new List<TroopSO>();
+    public List<TroopLevel> selectableTroops = new List<TroopLevel>();
     public GameObject troopCardPrefab;
     private List<TroopCardUI> _troopCards;
     public TroopCardUI currentSelectedTroop;
@@ -46,14 +57,14 @@ public class TroopManager : MonoBehaviour
         }
         
         // Create troop cards based on selectableTroops
-        foreach (TroopSO troopSO in selectableTroops)
+        foreach (TroopLevel troopLevel in selectableTroops)
         {
             GameObject troopCardObj = Instantiate(troopCardPrefab, troopCardContainer.transform);
             TroopCardUI troopCardUI = troopCardObj.GetComponent<TroopCardUI>();
             
             if (troopCardUI != null)
             {
-                troopCardUI.SetTroop(troopSO);
+                troopCardUI.SetTroop(troopLevel.troopSO, troopLevel.level);
                 _troopCards.Add(troopCardUI);
             }
         }
@@ -156,5 +167,58 @@ public class TroopManager : MonoBehaviour
             SetCurrentTroop(_troopCards[index]);
         }
         // If index is out of bounds or the troop card is null, do nothing
+    }
+    
+    public bool IsMaxTroopsReached()
+    {
+        return selectableTroops.Count >= maxSelectableTroops;
+    }
+    
+    public void RefreshTroopCards()
+    {
+        if (_troopCards != null)
+        {
+            // Clear all existing troop card children
+            foreach (Transform child in troopCardContainer.transform)
+            {
+                Destroy(child.gameObject);
+            }
+            
+            _troopCards.Clear();
+
+            // Create troop cards based on selectableTroops
+            foreach (TroopLevel troopLevel in selectableTroops)
+            {
+                GameObject troopCardObj = Instantiate(troopCardPrefab, troopCardContainer.transform);
+                TroopCardUI troopCardUI = troopCardObj.GetComponent<TroopCardUI>();
+
+                if (troopCardUI != null)
+                {
+                    troopCardUI.SetTroop(troopLevel.troopSO, troopLevel.level);
+                    _troopCards.Add(troopCardUI);
+                }
+            }
+        }
+    }
+    
+    public void RemoveTroopFromShop(TroopCardUI troopCardUI)
+    {
+        // Find and remove the troop from selectableTroops
+        TroopLevel troopToRemove = null;
+        foreach (TroopLevel troopLevel in selectableTroops)
+        {
+            if (troopLevel.troopSO == troopCardUI.troopSO)
+            {
+                troopToRemove = troopLevel;
+                break;
+            }
+        }
+        
+        if (troopToRemove != null)
+        {
+            selectableTroops.Remove(troopToRemove);
+            // Refresh the troop cards to reflect the change
+            RefreshTroopCards();
+        }
     }
 }

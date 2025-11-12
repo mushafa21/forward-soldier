@@ -16,10 +16,14 @@ MonoBehaviour:
   damage: 10
   attackRange: 1
   movementSpeed: 3
+  speedCategory: NORMAL
   attackCooldown: 1
   spawnCooldown: 2
   soulCost: 5
   soulGainedWhenDefeated: 2
+  projectilePrefab: {fileID: 0}
+  projectileSpeed: 10
+  name: SWORDSMAN
   potrait: {fileID: 2444409878323800028, guid: d0d01dd43973a4c4090943e2426b796c, type: 3}
   walkSound: {fileID: 8300000, guid: 3faf9124e537748d99ead1cb8d03ba6d, type: 3}
   hitSound: {fileID: 8300000, guid: 7fd4a0bb348c34d6b83e244087845ee7, type: 3}

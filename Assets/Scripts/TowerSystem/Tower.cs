@@ -107,7 +107,7 @@ namespace TowerSystem
             return maxHealth > 0 ? currentHealth / maxHealth : 0;
         }
 
-        void UpdateUI()
+        public void UpdateUI()
         {
             if (healthText != null)
             {

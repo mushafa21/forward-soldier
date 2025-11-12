@@ -16,23 +16,56 @@ public class TroopCardUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     public GameObject selectedIndicator;
     public TextMeshProUGUI coolDownText;
     public Image coolDownImage;
+    public TextMeshProUGUI nameText,healthText,attactText,speedText,levelText;
+    public int currentLevel = 1;
+    
+    [Header("Remove Button")]
+    public Button removeButton; // Button to remove this troop from the shop
     
     public bool isSelected = false;
     public bool isInCooldown = false;
     public GameObject statsObject;
 
     public bool isShowingStats = false;
+
+    private bool _isShopItem = false;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        button.onClick.AddListener(SelectTroop);
-        InitTroop();
+        if (!_isShopItem)
+        {
+            button.onClick.AddListener(SelectTroop);
+        }
+        
+        if (removeButton != null)
+        {
+            removeButton.onClick.AddListener(RemoveTroop);
+        }
+
+        if (troopSO != null)
+        {
+            InitTroop();
+
+        }
+        
     }
 
-    public void SetTroop(TroopSO troop)
+    public void SetTroop(TroopSO troop, int level)
     {
         troopSO = troop;
+        currentLevel = level;
     }
+    
+    public void SetShopItem(TroopSO troop, int level)
+    {
+        troopSO = troop;
+        currentLevel = level;
+        _isShopItem = true;
+        levelText.gameObject.SetActive(false);
+        InitTroop();
+
+    }
+
     
 
     void SelectTroop()
@@ -45,6 +78,12 @@ public class TroopCardUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     {
         troopPotrait.sprite = troopSO.potrait;
         troopCostText.text = troopSO.soulCost.ToString();
+        attactText.text = troopSO.GetDamageAtLevel(currentLevel).ToString("F0"); // Format to integer
+        healthText.text = troopSO.GetHealthAtLevel(currentLevel).ToString("F0"); // Format to integer
+        speedText.text = troopSO.speedCategory;
+        nameText.text = troopSO.name;
+        levelText.text = "LVL " + currentLevel;
+
     }
 
     public void StartCooldown()
@@ -114,5 +153,11 @@ public class TroopCardUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
             isShowingStats = false;
             statsObject.GetComponent<SlideInAnimator>().HideSlideOut();
         }
+    }
+    
+    void RemoveTroop()
+    {
+        // Remove this troop from the TroopManager's selectable troops
+        TroopManager.Instance.RemoveTroopFromShop(this);
     }
 }

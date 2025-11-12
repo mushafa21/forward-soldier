@@ -16,7 +16,7 @@ public class EnemyManager : MonoBehaviour
     [Header("Spawn Settings")]
     public GameObject troopPrefab; // Prefab of the troop to spawn
     public List<LanePath> spawnPaths = new List<LanePath>(); // List of paths where the enemy can spawn troops
-    public List<TroopSO> spawnableTroops = new List<TroopSO>(); // List of troops the enemy can spawn
+    public List<TroopLevel> spawnableTroops = new List<TroopLevel>(); // List of troops the enemy can spawn
     public float spawnDecisionInterval = 5f; // Time in seconds between spawn decisions
 
     private bool isInitialized = false;
@@ -111,28 +111,28 @@ public class EnemyManager : MonoBehaviour
             return;
 
         // Find a valid troop to spawn based on available souls
-        TroopSO troopToSpawn = GetAffordableTroop();
+        TroopLevel troopToSpawn = GetAffordableTroop();
 
-        if (troopToSpawn != null && currentSouls >= troopToSpawn.soulCost)
+        if (troopToSpawn != null && currentSouls >= troopToSpawn.troopSO.soulCost)
         {
             // Select a random path
             LanePath selectedPath = spawnPaths[Random.Range(0, spawnPaths.Count)];
             
             // Spawn the troop at the selected path
-            SpawnTroop(troopToSpawn, selectedPath);
+            SpawnTroop(troopToSpawn.troopSO, selectedPath,troopToSpawn.level );
         }
         // If no affordable troop is found, the enemy will wait until it has more souls
     }
 
-    private TroopSO GetAffordableTroop()
+    private TroopLevel GetAffordableTroop()
     {
-        List<TroopSO> affordableTroops = new List<TroopSO>();
+        List<TroopLevel> affordableTroops = new List<TroopLevel>();
         
-        foreach (TroopSO troopSO in spawnableTroops)
+        foreach (TroopLevel troopLevel in spawnableTroops)
         {
-            if (currentSouls >= troopSO.soulCost)
+            if (currentSouls >= troopLevel.troopSO.soulCost)
             {
-                affordableTroops.Add(troopSO);
+                affordableTroops.Add(troopLevel);
             }
         }
         
@@ -145,7 +145,7 @@ public class EnemyManager : MonoBehaviour
         return null; // No affordable troops
     }
 
-    public void SpawnTroop(TroopSO troopSO, LanePath path)
+    public void SpawnTroop(TroopSO troopSO, LanePath path, int level)
     {
         if (troopSO == null || path == null || troopPrefab == null)
         {
@@ -165,6 +165,7 @@ public class EnemyManager : MonoBehaviour
             newTroop.faction = TroopFaction.Enemy; // Set the faction to Enemy
             newTroop.SetPath(path);
             newTroop.SetTroopSO(troopSO);
+            newTroop.level = level; // Default to level 1 for enemy troops (could be configurable)
         }
 
         Debug.Log($"Enemy spawned troop: {troopSO.name} at path: {path.name}");

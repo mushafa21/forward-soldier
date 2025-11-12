@@ -1,3 +1,4 @@
+using TowerSystem;
 using UnityEngine;
 
 namespace TroopSystem
@@ -55,12 +56,19 @@ namespace TroopSystem
             {
                 // Apply damage to the target troop
                 Troop targetTroop = target.GetComponent<Troop>();
+                Tower tower = target.GetComponent<Tower>();
                 if (targetTroop != null)
                 {
                     // Check that target troop is still alive
                     if (targetTroop.currentHealth > 0)
                     {
                         targetTroop.TakeDamage(damage);
+                    }
+                } else if (tower != null)
+                {
+                    if (tower.currentHealth > 0)
+                    {
+                        tower.TakeDamage(damage);
                     }
                 }
                 
