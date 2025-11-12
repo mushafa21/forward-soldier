@@ -1,9 +1,12 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using Unity.VisualScripting;
+using UnityEngine.EventSystems;
 
-public class TroopCardUI : MonoBehaviour
+public class TroopCardUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     [Header("References")]
     public Button button;
@@ -16,7 +19,9 @@ public class TroopCardUI : MonoBehaviour
     
     public bool isSelected = false;
     public bool isInCooldown = false;
-    
+    public GameObject statsObject;
+
+    public bool isShowingStats = false;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -91,7 +96,23 @@ public class TroopCardUI : MonoBehaviour
         if (selectedIndicator != null)
             selectedIndicator.SetActive(false);
     }
-    
 
 
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        if (!isShowingStats)
+        {
+            isShowingStats = true;
+            statsObject.SetActive(true);
+        }
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        if (isShowingStats)
+        {
+            isShowingStats = false;
+            statsObject.GetComponent<SlideInAnimator>().HideSlideOut();
+        }
+    }
 }

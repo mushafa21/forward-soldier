@@ -8,6 +8,9 @@ using UnityEngine;
 public class LevelManager : MonoBehaviour
 {
     
+    
+    public GameObject victoryScreen;
+    public GameObject deathScreen;
  
     private static LevelManager instance;
 
@@ -33,5 +36,11 @@ public class LevelManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    }
+
+    public void ShowVictoryScreen()
+    {
+        Time.timeScale = 0;
+        victoryScreen.SetActive(true);
     }
 }

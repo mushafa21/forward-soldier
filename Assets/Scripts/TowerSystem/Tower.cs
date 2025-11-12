@@ -29,7 +29,8 @@ namespace TowerSystem
         public Color enemyColor = Color.red;
         public SpriteRenderer mageSprite;
         public Material factionMaterial; // Assign your 'Troop_ColorSwap_Material' here
-
+        public ParticleSystem hitParticle;
+        public ParticleSystem destroyParticle;
         void Start()
         {
             currentHealth = maxHealth;
@@ -48,11 +49,14 @@ namespace TowerSystem
                 currentHealth = 0;
                 OnTowerDestroyed();
             }
+            hitParticle.Play();
         }
 
         // Called when the tower is destroyed
         void OnTowerDestroyed()
         {
+            destroyParticle.Play();
+            LevelManager.Instance.ShowVictoryScreen();
             Debug.Log($"{faction} tower has been destroyed!");
             // In a real game, you might want to trigger game over conditions
             // or other tower destruction logic here

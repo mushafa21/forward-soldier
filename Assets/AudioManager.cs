@@ -1,229 +1,135 @@
-using UnityEngine;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using Random = UnityEngine.Random;
 
-[System.Serializable]
-public class AudioClipData
-{
-    public string name;
-    public AudioClip clip;
-    [Range(0f, 1f)] public float volume = 1f;
-    [Range(-3f, 3f)] public float pitch = 1f;
-    public bool loop = false;
-}
-
+[RequireComponent(typeof(AudioSource), typeof(AudioSource))]
 public class AudioManager : MonoBehaviour
 {
-    [Header("Audio Settings")] [SerializeField]
-    private AudioSource musicSource;
 
-    [SerializeField] private AudioSource sfxSource;
+    [SerializeField] private AudioClip defaultButtonClickSound, defaultButtonHoverSound;
+    public AudioClip mainMenuMusic;
+    #region Singleton Pattern
 
-    [Header("Audio Clips")] [SerializeField]
-    private List<AudioClipData> musicClips = new List<AudioClipData>();
-
-    [SerializeField] private List<AudioClipData> sfxClips = new List<AudioClipData>();
-
-    private Dictionary<string, AudioClipData> musicClipDictionary = new Dictionary<string, AudioClipData>();
-    private Dictionary<string, AudioClipData> sfxClipDictionary = new Dictionary<string, AudioClipData>();
-
-    private static AudioManager instance;
-
-    public static AudioManager Instance
-    {
-        get
-        {
-            return instance;
-        }
-    }
+    public static AudioManager Instance { get; private set; }
+    private float minPitch = 0.9f;
+    private float maxPitch = 1.1f;
 
     private void Awake()
     {
-        if (instance == null)
-        {
-            instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
+        if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
+            return;
         }
-        InitializeAudioDictionaries();
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+        InitializeAudioSources();
+    }
 
+    #endregion
+
+    #region Audio Sources
+    
+    [SerializeField] private AudioSource _musicSource;
+    [SerializeField] private AudioSource _sfxSource;
+    [SerializeField] private List<AudioSource> _sfxPool = new List<AudioSource>();
+
+    private void InitializeAudioSources()
+    {
+        _musicSource.loop = true;
+    }
+
+    #endregion
+
+    #region Public Playback Methods
+    
+    public void PlayMusic(AudioClip musicClip)
+    {
+        if (_musicSource.clip == musicClip && _musicSource.isPlaying)
+        {
+            return;
+        }
+
+        _musicSource.clip = musicClip;
+        _musicSource.Play();
     }
     
-
-    private void InitializeAudioDictionaries()
+    public void PlayMainMenuMusic()
     {
-        // Create dictionaries for faster lookup
-        foreach (AudioClipData clipData in musicClips)
-        {
-            if (clipData.clip != null && !string.IsNullOrEmpty(clipData.name))
-            {
-                if (!musicClipDictionary.ContainsKey(clipData.name))
-                {
-                    musicClipDictionary.Add(clipData.name, clipData);
-                }
-            }
-        }
-
-        foreach (AudioClipData clipData in sfxClips)
-        {
-            if (clipData.clip != null && !string.IsNullOrEmpty(clipData.name))
-            {
-                if (!sfxClipDictionary.ContainsKey(clipData.name))
-                {
-                    sfxClipDictionary.Add(clipData.name, clipData);
-                }
-            }
-        }
+        
+        _musicSource.clip = mainMenuMusic;
+        _musicSource.Play();
     }
-
-    #region Music Functions
-
-    public void PlayMusic(string musicName, bool loop = true)
-    {
-        if (musicSource == null)
-        {
-            Debug.LogWarning("Music AudioSource is not assigned in AudioManager!");
-            return;
-        }
-
-        if (musicClipDictionary.TryGetValue(musicName, out AudioClipData clipData))
-        {
-            musicSource.clip = clipData.clip;
-            musicSource.volume = clipData.volume;
-            musicSource.pitch = clipData.pitch;
-            musicSource.loop = loop;
-
-            if (musicSource.isPlaying)
-            {
-                musicSource.Stop();
-            }
-
-            musicSource.Play();
-        }
-        else
-        {
-            Debug.LogWarning($"Music clip '{musicName}' not found in AudioManager!");
-        }
-    }
-
+    
     public void StopMusic()
     {
-        if (musicSource != null && musicSource.isPlaying)
-        {
-            musicSource.Stop();
-        }
+        _musicSource.Stop();
     }
-
-    public void PauseMusic()
+    
+    public void PlaySFX(AudioClip sfxClip)
     {
-        if (musicSource != null && musicSource.isPlaying)
-        {
-            musicSource.Pause();
-        }
+        if (sfxClip == null) return;
+        _sfxSource.PlayOneShot(sfxClip);
     }
 
-    public void ResumeMusic()
+    private float temporaryVolume;
+    public void PlaySFX(AudioClip sfxClip, float volume)
     {
-        if (musicSource != null && !musicSource.isPlaying)
-        {
-            musicSource.UnPause();
-        }
+        temporaryVolume = _sfxSource.volume;
+        _sfxSource.volume = volume;
+        if (sfxClip == null) return;
+        _sfxSource.PlayOneShot(sfxClip);
+        _sfxSource.volume = temporaryVolume;
     }
-
-    public void SetMusicVolume(float volume)
+    
+    public void PlaySFXAtPosition(AudioClip clip, Vector3 position)
     {
-        if (musicSource != null)
+        AudioSource available = _sfxPool.FirstOrDefault(s => !s.isPlaying);
+        if (available != null)
         {
-            musicSource.volume = Mathf.Clamp01(volume);
+            available.transform.position = position;
+            available.PlayOneShot(clip);
         }
     }
-
-    #endregion
-
-    #region SFX Functions
-
-    public void PlaySFX(string sfxName)
-    {
-        if (sfxSource == null)
-        {
-            Debug.LogWarning("SFX AudioSource is not assigned in AudioManager!");
-            return;
-        }
-
-        if (sfxClipDictionary.TryGetValue(sfxName, out AudioClipData clipData))
-        {
-            sfxSource.PlayOneShot(clipData.clip, clipData.volume);
-        }
-        else
-        {
-            Debug.LogWarning($"SFX clip '{sfxName}' not found in AudioManager!");
-        }
-    }
-
-    public void PlaySFX(AudioClip clip, float volume = 1f)
-    {
-        if (sfxSource == null)
-        {
-            Debug.LogWarning("SFX AudioSource is not assigned in AudioManager!");
-            return;
-        }
-
-        if (clip != null)
-        {
-            sfxSource.PlayOneShot(clip, volume);
-        }
-    }
-
-    public void PlaySFXAtPosition(string sfxName, Vector3 position)
-    {
-        if (sfxClipDictionary.TryGetValue(sfxName, out AudioClipData clipData))
-        {
-            PlaySFXAtPosition(clipData.clip, position, clipData.volume);
-        }
-        else
-        {
-            Debug.LogWarning($"SFX clip '{sfxName}' not found in AudioManager!");
-        }
-    }
-
-    public void PlaySFXAtPosition(AudioClip clip, Vector3 position, float volume = 1f)
-    {
-        if (clip == null)
-        {
-            Debug.LogWarning("AudioClip is null in PlaySFXAtPosition!");
-            return;
-        }
-
-        AudioSource.PlayClipAtPoint(clip, position, volume);
-    }
-
-    public void SetSFXVolume(float volume)
-    {
-        if (sfxSource != null)
-        {
-            sfxSource.volume = Mathf.Clamp01(volume);
-        }
-    }
-
+    
     public void StopSFX()
     {
-        sfxSource.Stop();
+        _sfxSource.Stop();
+    }
+    
+    public void PlayButtonClickSound()
+    {
+        _sfxSource.PlayOneShot(defaultButtonClickSound);
+    }
+    
+    public void PlayButtonHoverSound()
+    {
+        _sfxSource.PlayOneShot(defaultButtonHoverSound);
     }
 
     #endregion
 
-    #region Utility Functions
-
-    public bool IsMusicPlaying()
+    #region Volume Control
+    public void SetMusicVolume(float volume)
     {
-        return musicSource != null && musicSource.isPlaying;
+        _musicSource.volume = Mathf.Clamp01(volume);
     }
-
-    public bool IsSFXPlaying()
+    
+    public void SetSfxVolume(float volume)
     {
-        return sfxSource != null && sfxSource.isPlaying;
+        _sfxSource.volume = Mathf.Clamp01(volume);
+    }
+    
+    public void EnableMusic(bool enable)
+    {
+        _musicSource.enabled = enable;
+    }
+    
+    public void EnableSfx(bool enable)
+    {
+        _sfxSource.enabled = enable;
     }
 
     #endregion

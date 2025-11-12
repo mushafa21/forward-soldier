@@ -78,6 +78,8 @@ namespace TroopSystem
         private bool hasReachedEnd = false;
         private float originalScaleX = 0f; // Store original x scale to properly flip
         private float originalParticleScaleX = 0f; // Store original particle x scale
+        private float originalParticlePositionX = 0f; // Store original particle x scale
+
         private TowerSystem.Tower targetTower = null; // Tower that this troop is targeting
         private Troop targetTroop = null; // Other troop that this troop is targeting
         private float yPositionOffset = 0f; // Y offset for this specific troop
@@ -93,6 +95,7 @@ namespace TroopSystem
             if (walkParticle != null)
             {
                 originalParticleScaleX = walkParticle.transform.localScale.x;
+                originalParticlePositionX = walkParticle.transform.localPosition.x;
             }
 
             // *** ADD THIS ***
@@ -687,7 +690,8 @@ namespace TroopSystem
                 transform.localScale = new Vector3(-Mathf.Abs(originalScaleX), transform.localScale.y, transform.localScale.z);
                 if (walkParticle != null)
                 {
-                    walkParticle.transform.localScale = new Vector3(-Mathf.Abs(originalParticleScaleX), walkParticle.transform.localScale.y, walkParticle.transform.localScale.z);
+                    // walkParticle.transform.localPosition = new Vector3(-Mathf.Abs(originalParticlePositionX),walkParticle.transform.localPosition.y, walkParticle.transform.localPosition.z);
+                    // walkParticle.transform.localScale = new Vector3(-Mathf.Abs(originalParticleScaleX), walkParticle.transform.localScale.y, walkParticle.transform.localScale.z);
                 }
             }
             else if (towerPosition.x > transform.position.x) // Moving right
@@ -696,7 +700,8 @@ namespace TroopSystem
                 transform.localScale = new Vector3(Mathf.Abs(originalScaleX), transform.localScale.y, transform.localScale.z);
                 if (walkParticle != null)
                 {
-                    walkParticle.transform.localScale = new Vector3(Mathf.Abs(originalParticleScaleX), walkParticle.transform.localScale.y, walkParticle.transform.localScale.z);
+                    // walkParticle.transform.localPosition = new Vector3(Mathf.Abs(originalParticlePositionX),walkParticle.transform.localPosition.y, walkParticle.transform.localPosition.z);
+                    // walkParticle.transform.localScale = new Vector3(Mathf.Abs(originalParticleScaleX), walkParticle.transform.localScale.y, walkParticle.transform.localScale.z);
                 }
             }
         }
@@ -776,6 +781,7 @@ namespace TroopSystem
         // Play attack sound once
         private void PlayAttackSound()
         {
+            AudioManager.Instance.PlaySFX(troopStats.hitSound);
             if (audioSource != null && troopStats != null && troopStats.hitSound != null)
             {
                 // Stop any looping sounds (like walk sound) before playing attack sound
@@ -788,19 +794,20 @@ namespace TroopSystem
         
         private void PlayDeathSound()
         {
+
             if (audioSource != null && troopStats != null && troopStats.hitSound != null)
             {
                 // Stop any looping sounds (like walk sound) before playing attack sound
                 audioSource.loop = false;
                 if (faction == TroopFaction.Player)
                 {
-                    audioSource.PlayOneShot(troopStats.allyDeathSound);
-
+                    AudioManager.Instance.PlaySFX(troopStats.allyDeathSound);
+                    
                 }
                 else
                 {
-                    audioSource.PlayOneShot(troopStats.enemyDeathSound);
-
+                    AudioManager.Instance.PlaySFX(troopStats.enemyDeathSound);
+                    
                 }
                 
             }
@@ -862,30 +869,66 @@ namespace TroopSystem
         {
             if (currentState == TroopState.Attack) // Make sure we're still in attack state
             {
-                // Only attack the currently assigned target (tower or troop)
-                if (targetTower != null)
+                // Check if troop SO has a projectile prefab to use
+                if (troopStats != null && troopStats.projectilePrefab != null)
                 {
-                    // Check if the tower is still alive and in range
-                    if (targetTower.currentHealth > 0 && targetTower.isActiveAndEnabled)
+                    // Use projectile attack instead of direct attack
+                    if (targetTower != null)
                     {
-                        float distanceToTower = Vector3.Distance(transform.position, targetTower.transform.position);
-                        // Add size compensation for larger towers
-                        float effectiveTowerRange = attackRange + towerSizeCompensation;
-                        if (distanceToTower <= effectiveTowerRange || hasReachedEnd)
+                        // Check if the tower is still alive and in range
+                        if (targetTower.currentHealth > 0 && targetTower.isActiveAndEnabled)
                         {
-                            targetTower.TakeDamage(damage);
+                            float distanceToTower = Vector3.Distance(transform.position, targetTower.transform.position);
+                            // Add size compensation for larger towers
+                            float effectiveTowerRange = attackRange + towerSizeCompensation;
+                            if (distanceToTower <= effectiveTowerRange || hasReachedEnd)
+                            {
+                                // Spawn projectile towards the tower
+                                SpawnProjectile(targetTower.transform);
+                            }
+                        }
+                    }
+                    else if (targetTroop != null)
+                    {
+                        // Check if the target troop is still alive and in range
+                        if (targetTroop.currentHealth > 0 && targetTroop.isActiveAndEnabled)
+                        {
+                            float distanceToTroop = Vector3.Distance(transform.position, targetTroop.transform.position);
+                            if (distanceToTroop <= attackRange)
+                            {
+                                // Spawn projectile towards the target troop
+                                SpawnProjectile(targetTroop.transform);
+                            }
                         }
                     }
                 }
-                else if (targetTroop != null)
+                else
                 {
-                    // Check if the target troop is still alive and in range
-                    if (targetTroop.currentHealth > 0 && targetTroop.isActiveAndEnabled)
+                    // Use direct attack (original behavior) if no projectile prefab is set
+                    if (targetTower != null)
                     {
-                        float distanceToTroop = Vector3.Distance(transform.position, targetTroop.transform.position);
-                        if (distanceToTroop <= attackRange)
+                        // Check if the tower is still alive and in range
+                        if (targetTower.currentHealth > 0 && targetTower.isActiveAndEnabled)
                         {
-                            targetTroop.TakeDamage(damage);
+                            float distanceToTower = Vector3.Distance(transform.position, targetTower.transform.position);
+                            // Add size compensation for larger towers
+                            float effectiveTowerRange = attackRange + towerSizeCompensation;
+                            if (distanceToTower <= effectiveTowerRange || hasReachedEnd)
+                            {
+                                targetTower.TakeDamage(damage);
+                            }
+                        }
+                    }
+                    else if (targetTroop != null)
+                    {
+                        // Check if the target troop is still alive and in range
+                        if (targetTroop.currentHealth > 0 && targetTroop.isActiveAndEnabled)
+                        {
+                            float distanceToTroop = Vector3.Distance(transform.position, targetTroop.transform.position);
+                            if (distanceToTroop <= attackRange)
+                            {
+                                targetTroop.TakeDamage(damage);
+                            }
                         }
                     }
                 }
@@ -895,6 +938,25 @@ namespace TroopSystem
                 
                 // Go to idle state for the remainder of cooldown
                 ChangeState(TroopState.Idle);
+            }
+        }
+        
+        private void SpawnProjectile(Transform target)
+        {
+            if (troopStats != null && troopStats.projectilePrefab != null)
+            {
+                // Spawn the projectile at the current troop's position
+                GameObject projectileObj = Instantiate(troopStats.projectilePrefab, transform.position, Quaternion.identity);
+                
+                // Get the projectile component and initialize it
+                Projectile projectile = projectileObj.GetComponent<Projectile>();
+                if (projectile != null)
+                {
+                    // Use the projectile speed from the troop SO
+                    float projectileSpeed = troopStats.projectileSpeed;
+                    // Initialize with target, source troop, damage and speed
+                    projectile.Initialize(target, this, damage, projectileSpeed);
+                }
             }
         }
 

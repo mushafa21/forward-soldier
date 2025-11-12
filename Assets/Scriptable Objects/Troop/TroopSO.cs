@@ -16,6 +16,8 @@ public class TroopSO : ScriptableObject
     public float spawnCooldown;
     public float soulCost;
     public float soulGainedWhenDefeated;
+    public GameObject projectilePrefab;
+    public float projectileSpeed = 10f;
 
 
     [Header("Presentation")] 
