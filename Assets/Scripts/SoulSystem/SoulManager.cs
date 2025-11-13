@@ -38,8 +38,16 @@ namespace SoulSystem
             }
         }
 
+        public void ResetSouls()
+        {
+            souls = 0;
+            UIManager.Instance.UpdateSoulText(souls,maxSouls);
+
+        }
+
         private void Start()
         {
+            ResetSouls();
             UIManager.Instance.UpdateSoulText(souls,maxSouls);
         }
 

@@ -23,7 +23,6 @@ namespace PathSystem
             if (instance == null)
             {
                 instance = this;
-                DontDestroyOnLoad(gameObject);
             }
             else
             {

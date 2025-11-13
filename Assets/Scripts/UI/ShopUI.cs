@@ -19,9 +19,11 @@ public class ShopUI : MonoBehaviour
 
     private List<ShopItemSO> currentShopItems; // Currently displayed shop items
     private List<ShopItemUI> shopItemUIs; // List of active shop item UIs
+    public AudioClip shopMusic;
 
     void Start()
     {
+        AudioManager.Instance.PlayMusic(shopMusic);
         currentShopItems = new List<ShopItemSO>();
         shopItemUIs = new List<ShopItemUI>();
         
@@ -229,7 +231,7 @@ public class ShopUI : MonoBehaviour
     {
         // Increase tower health by 20% per upgrade (adjust as needed)
         float healthIncreasePercentage = 0.2f; // 20% increase per upgrade
-        float baseHealth = 1000f; // Base tower health
+        float baseHealth = 200; // Base tower health
         
         // Save the tower level in GameManager first (to get the next level)
         GameManager.Instance.IncreaseTowerLevel();

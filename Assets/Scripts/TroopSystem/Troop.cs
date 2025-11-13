@@ -856,7 +856,7 @@ namespace TroopSystem
                     StopWalkSound(); // Stop walk sound when entering death state
                     if (faction == TroopFaction.Player)
                     {
-                        
+                        EnemyManager.Instance.IncreaseSouls(troopStats.soulGainedWhenDefeated);
                     } else if (faction == TroopFaction.Enemy)
                     {
                         SoulManager.Instance.IncreaseSouls(troopStats.soulGainedWhenDefeated);

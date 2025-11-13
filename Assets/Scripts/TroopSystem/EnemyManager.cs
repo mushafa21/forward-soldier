@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using PathSystem;
 using SoulSystem;
@@ -15,6 +16,8 @@ public class EnemyManager : MonoBehaviour
 
     [Header("Spawn Settings")]
     public GameObject troopPrefab; // Prefab of the troop to spawn
+    public GameObject spawnEffectPrefab; // Prefab of the troop to spawn
+
     public List<LanePath> spawnPaths = new List<LanePath>(); // List of paths where the enemy can spawn troops
     public List<TroopLevel> spawnableTroops = new List<TroopLevel>(); // List of troops the enemy can spawn
     public float spawnDecisionInterval = 5f; // Time in seconds between spawn decisions
@@ -44,7 +47,6 @@ public class EnemyManager : MonoBehaviour
         if (instance == null)
         {
             instance = this;
-            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -118,8 +120,12 @@ public class EnemyManager : MonoBehaviour
             // Select a random path
             LanePath selectedPath = spawnPaths[Random.Range(0, spawnPaths.Count)];
             
+            // Add enemy level bonus to the troop level
+            int enemyLevel = GameManager.Instance != null ? GameManager.Instance.GetEnemyLevel() : 0;
+            int troopSpawnLevel = troopToSpawn.level + enemyLevel;
+            
             // Spawn the troop at the selected path
-            SpawnTroop(troopToSpawn.troopSO, selectedPath,troopToSpawn.level );
+            SpawnTroop(troopToSpawn.troopSO, selectedPath, troopSpawnLevel);
         }
         // If no affordable troop is found, the enemy will wait until it has more souls
     }
@@ -166,6 +172,12 @@ public class EnemyManager : MonoBehaviour
             newTroop.SetPath(path);
             newTroop.SetTroopSO(troopSO);
             newTroop.level = level; // Default to level 1 for enemy troops (could be configurable)
+        }
+
+        if (spawnEffectPrefab != null)
+        {
+            GameObject spawn = Instantiate(spawnEffectPrefab, transform);
+            spawn.transform.position = path.GetEndPoint();
         }
 
         Debug.Log($"Enemy spawned troop: {troopSO.name} at path: {path.name}");

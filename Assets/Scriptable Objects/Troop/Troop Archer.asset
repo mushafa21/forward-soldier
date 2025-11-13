@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Troop Archer
   m_EditorClassIdentifier: 
   health: 30
-  damage: 5
+  damage: 7
   attackRange: 7
-  movementSpeed: 2
+  movementSpeed: 3
   speedCategory: NORMAL
   attackCooldown: 1.5
   spawnCooldown: 2

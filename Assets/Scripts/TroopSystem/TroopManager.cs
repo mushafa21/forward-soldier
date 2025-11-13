@@ -22,7 +22,7 @@ public class TroopManager : MonoBehaviour
     public GameObject troopCardPrefab;
     private List<TroopCardUI> _troopCards;
     public TroopCardUI currentSelectedTroop;
-    public GameObject troopCardContainer;
+    private GameObject troopCardContainer;
     
     
     public static TroopManager Instance
@@ -48,6 +48,7 @@ public class TroopManager : MonoBehaviour
 
     private void Start()
     {
+        troopCardContainer = GameManager.Instance.troopContainer;
         _troopCards = new List<TroopCardUI>();
         
         // Clear all existing troop card children

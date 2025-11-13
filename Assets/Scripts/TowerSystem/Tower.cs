@@ -33,6 +33,17 @@ namespace TowerSystem
         public ParticleSystem destroyParticle;
         void Start()
         {
+            // Scale maxHealth based on tower level from GameManager
+            if (faction == TowerFaction.Player && GameManager.Instance != null)
+            {
+                int towerLevel = GameManager.Instance.GetTowerLevel();
+                float healthIncreasePercentage = 0.2f; // 20% increase per level (same as in ShopUI)
+                float baseHealth = 200; // Base tower health
+                
+                // Calculate new max health using the same formula as in ShopUI
+                maxHealth = baseHealth * Mathf.Pow(1f + healthIncreasePercentage, towerLevel - 1);
+            }
+            
             currentHealth = maxHealth;
             SetFactionColor();
             UpdateUI();
@@ -56,7 +67,15 @@ namespace TowerSystem
         void OnTowerDestroyed()
         {
             destroyParticle.Play();
-            LevelManager.Instance.ShowVictoryScreen();
+            if (faction == TowerFaction.Player)
+            {
+                LevelManager.Instance.StartGameOverSequence();
+
+            } else if (faction == TowerFaction.Enemy)
+            {
+                LevelManager.Instance.StartVictorySequence();
+
+            }
             Debug.Log($"{faction} tower has been destroyed!");
             // In a real game, you might want to trigger game over conditions
             // or other tower destruction logic here

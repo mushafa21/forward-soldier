@@ -7394,6 +7394,7 @@ MonoBehaviour:
   currentWaypointIndex: 0
   faction: 0
   troopStats: {fileID: 11400000, guid: 611dff7e1ef934cf99405690e4ed82a3, type: 2}
+  level: 1
   maxHealth: 100
   currentHealth: 0
   damage: 20
