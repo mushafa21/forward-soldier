@@ -54,6 +54,7 @@ namespace TroopSystem
         public SpriteRenderer spriteRenderer; // *** ADD THIS ***
         public ParticleSystem spawnParticle;
         public ParticleSystem hitParticle;
+        public ParticleSystem dustParticle;
 
         [Header("Audio References")]
         public AudioSource audioSource; // Reference to the audio source component
@@ -88,6 +89,10 @@ namespace TroopSystem
         private float yPositionOffset = 0f; // Y offset for this specific troop
 
         private bool isWalkingSoundPlaying = false; // Track if walk sound is currently playing
+
+        // Flash effect when taking damage
+        private Coroutine flashCoroutine; // Track the flash coroutine
+        private Color originalSpriteColor = Color.white; // Store the original sprite color to restore after interruption
 
         // Awake is called before Start
         void Awake()
@@ -204,7 +209,7 @@ namespace TroopSystem
             // This is CRUCIAL so that changing one troop's color
             // doesn't change all troops using the same material.
             Material materialInstance = new Material(factionMaterial);
-            
+
             // Set the sprite renderer to use this new material instance
             spriteRenderer.material = materialInstance;
 
@@ -221,6 +226,9 @@ namespace TroopSystem
                 // This ensures Player troops stay blue.
                 materialInstance.SetColor("_TargetColor", playerColor);
             }
+
+            // Store the original sprite color for flash effect restoration
+            originalSpriteColor = spriteRenderer.color;
         }
 
 
@@ -745,7 +753,11 @@ namespace TroopSystem
 
             currentHealth -= damageAmount;
             hitParticle.Play();
-            
+            dustParticle.Play();
+
+            // Trigger flash effect when taking damage
+            TriggerFlashEffect();
+
             if (currentHealth <= 0)
             {
                 currentHealth = 0;
@@ -1018,6 +1030,54 @@ namespace TroopSystem
         void OnDestroy()
         {
             TroopManager.Instance?.RemoveTroop(this);
+        }
+
+        // Trigger the flash effect when taking damage
+        private void TriggerFlashEffect()
+        {
+            // Cancel any existing flash coroutine to prevent conflicts
+            if (flashCoroutine != null)
+            {
+                StopCoroutine(flashCoroutine);
+                // Ensure the sprite returns to its original color before starting a new flash
+                if (spriteRenderer != null)
+                {
+                    // Restore the sprite to its original color that was set during initialization
+                    // This ensures that if a previous flash was interrupted, it returns to its proper color
+                    spriteRenderer.color = originalSpriteColor;
+                }
+            }
+
+            // Start the new flash effect
+            flashCoroutine = StartCoroutine(FlashEffect());
+        }
+
+        // Coroutine for the flash effect
+        private System.Collections.IEnumerator FlashEffect()
+        {
+            if (spriteRenderer == null) yield break;
+
+            // Store original color to restore later
+            Color originalColor = spriteRenderer.color;
+
+            // Create a flash color that contrasts with the original
+            // If the original color is light, use a darker flash; if dark, use a lighter flash
+            Color flashColor = Color.red; // Use a saturated color for contrast
+
+            // Flash 3 times for a more noticeable effect
+            for (int i = 0; i < 2; i++)
+            {
+                // Flash ON - set to contrasting color
+                spriteRenderer.color = flashColor;
+                yield return new WaitForSeconds(0.05f); // Short flash duration
+
+                // Flash OFF - restore original color
+                spriteRenderer.color = originalColor;
+                yield return new WaitForSeconds(0.05f); // Short pause
+            }
+
+            // Ensure we end with the original color
+            spriteRenderer.color = originalColor;
         }
     }
 }
