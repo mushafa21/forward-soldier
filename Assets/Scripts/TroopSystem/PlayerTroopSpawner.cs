@@ -140,7 +140,7 @@ namespace TroopSystem
 
                 if (spawnEffect != null)
                 {
-                    Instantiate(spawnEffect,transform.position,Quaternion.identity);
+                    Instantiate(spawnEffect, transform);
                 }
             }
             else

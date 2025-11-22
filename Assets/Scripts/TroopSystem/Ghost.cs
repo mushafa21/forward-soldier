@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace TroopSystem
@@ -8,15 +9,29 @@ namespace TroopSystem
         public float floatSpeed = 1.0f;      // Speed at which the ghost moves upward
         public float floatHeight = 2.0f;     // Maximum height the ghost will float up to
         public float destroyDelay = 3.0f;    // Time before the ghost is destroyed
-
+        public Material enemyGhostMaterial;
         private Vector3 startPosition;       // Starting position of the ghost
-        private float spawnTime;             // Time when the ghost was spawned
+        private float spawnTime;          
+        private SpriteRenderer _spriteRenderer; // Time when the ghost was spawned
+
+        private void Awake()
+        {
+            _spriteRenderer = GetComponent<SpriteRenderer>();
+        }
 
         void Start()
         {
             startPosition = transform.position;
             spawnTime = Time.time;
             
+        }
+
+        public void SetFaction(TroopFaction faction)
+        {
+            if (faction == TroopFaction.Enemy)
+            {
+                _spriteRenderer.material = new Material(enemyGhostMaterial);
+            }
         }
 
         void Update()

@@ -55,11 +55,11 @@ MonoBehaviour:
   soulUpgradeLevel: 1
   currentLevelIndex: 0
   levelScenes:
-  - Leve1Scene
-  - Leve2Scene
-  - Leve3Scene
-  - Leve4Scene
-  - LeveFinalScene
+  - Level1Scene
+  - Level2Scene
+  - Level3Scene
+  - Level4Scene
+  - LevelFinalScene
   enemyLevel: 0
 --- !u!1001 &5146787272302111351
 PrefabInstance:

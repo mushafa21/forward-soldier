@@ -53,6 +53,8 @@ namespace TroopSystem
         public Animator animator; // Reference to the animator (if using animations)
         public SpriteRenderer spriteRenderer; // *** ADD THIS ***
         public ParticleSystem spawnParticle;
+        public ParticleSystem hitParticle;
+
         [Header("Audio References")]
         public AudioSource audioSource; // Reference to the audio source component
         
@@ -153,7 +155,6 @@ namespace TroopSystem
             
             UpdateHealth();
 
-            // *** ADD THIS ***
             InitializeFactionColor();
             
             // Register with the troop manager
@@ -555,10 +556,12 @@ namespace TroopSystem
                 ghostPosition.y += ghostSpawnYOffset;
                 
                 // Spawn the ghost
-                GameObject spawnedGhost = Instantiate(ghostPrefab, ghostPosition, Quaternion.identity);
+                GameObject spawnedGhost = Instantiate(ghostPrefab, transform);
+                spawnedGhost.GetComponent<Ghost>().SetFaction(faction);
+                spawnedGhost.transform.position = ghostPosition;
                 
-                // Set the ghost's parent to the troop so it gets destroyed when the troop is destroyed
-                spawnedGhost.transform.SetParent(transform);
+                // // Set the ghost's parent to the troop so it gets destroyed when the troop is destroyed
+                // spawnedGhost.transform.SetParent(transform);
             }
 
         }
@@ -691,9 +694,11 @@ namespace TroopSystem
                 transform.localScale = new Vector3(-Mathf.Abs(originalScaleX), transform.localScale.y, transform.localScale.z);
                 if (walkParticle != null)
                 {
-                    // walkParticle.transform.localPosition = new Vector3(-Mathf.Abs(originalParticlePositionX),walkParticle.transform.localPosition.y, walkParticle.transform.localPosition.z);
-                    // walkParticle.transform.localScale = new Vector3(-Mathf.Abs(originalParticleScaleX), walkParticle.transform.localScale.y, walkParticle.transform.localScale.z);
+                    walkParticle.transform.localPosition = new Vector3(-Mathf.Abs(originalParticlePositionX),walkParticle.transform.localPosition.y, walkParticle.transform.localPosition.z);
+                    walkParticle.transform.localScale = new Vector3(-Mathf.Abs(originalParticleScaleX), walkParticle.transform.localScale.y, walkParticle.transform.localScale.z);
                 }
+                
+                hitParticle.GetComponent<ParticleSystemRenderer>().flip = new Vector3(1, 0, 0);
             }
             else if (towerPosition.x > transform.position.x) // Moving right
             {
@@ -701,9 +706,11 @@ namespace TroopSystem
                 transform.localScale = new Vector3(Mathf.Abs(originalScaleX), transform.localScale.y, transform.localScale.z);
                 if (walkParticle != null)
                 {
-                    // walkParticle.transform.localPosition = new Vector3(Mathf.Abs(originalParticlePositionX),walkParticle.transform.localPosition.y, walkParticle.transform.localPosition.z);
-                    // walkParticle.transform.localScale = new Vector3(Mathf.Abs(originalParticleScaleX), walkParticle.transform.localScale.y, walkParticle.transform.localScale.z);
+                    walkParticle.transform.localPosition = new Vector3(Mathf.Abs(originalParticlePositionX),walkParticle.transform.localPosition.y, walkParticle.transform.localPosition.z);
+                    walkParticle.transform.localScale = new Vector3(Mathf.Abs(originalParticleScaleX), walkParticle.transform.localScale.y, walkParticle.transform.localScale.z);
                 }
+                hitParticle.GetComponent<ParticleSystemRenderer>().flip = new Vector3(0, 0, 0);
+
             }
         }
 
@@ -737,6 +744,7 @@ namespace TroopSystem
             if (currentHealth <= 0) return; // Already dead
 
             currentHealth -= damageAmount;
+            hitParticle.Play();
             
             if (currentHealth <= 0)
             {

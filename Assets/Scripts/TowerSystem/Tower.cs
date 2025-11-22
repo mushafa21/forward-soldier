@@ -29,6 +29,10 @@ namespace TowerSystem
         public Color enemyColor = Color.red;
         public SpriteRenderer mageSprite;
         public Material factionMaterial; // Assign your 'Troop_ColorSwap_Material' here
+        public Material flagMaterial; // Assign your 'Troop_ColorSwap_Material' here
+        public SpriteRenderer flagSprite1;
+        public SpriteRenderer flagSprite2;
+
         public ParticleSystem hitParticle;
         public ParticleSystem destroyParticle;
         void Start()
@@ -102,6 +106,7 @@ namespace TowerSystem
             // Set the '_TargetColor' property on the shader
             if (faction == TowerFaction.Enemy)
             {
+        
                 materialInstance.SetColor("_TargetColor", enemyColor);
                 mageSprite.gameObject.transform.localScale = new Vector3(mageSprite.gameObject.transform.localScale.x * -1, mageSprite.gameObject.transform.localScale.y, mageSprite.gameObject.transform.localScale.z);
                 towerRenderer.gameObject.transform.localScale = new Vector3(towerRenderer.gameObject.transform.localScale.x * -1, towerRenderer.gameObject.transform.localScale.y, towerRenderer.gameObject.transform.localScale.z);
@@ -113,6 +118,8 @@ namespace TowerSystem
                 // as the source color (which is set on the material asset).
                 // Or, you can set it to a specific playerColor.
                 // This ensures Player troops stay blue.
+                flagSprite1.material = new Material(flagMaterial);
+                flagSprite2.material = new Material(flagMaterial);
                 materialInstance.SetColor("_TargetColor", playerColor);
             }
         }

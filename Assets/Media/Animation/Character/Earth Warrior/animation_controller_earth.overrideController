@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!221 &22100000
+AnimatorOverrideController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: animation_controller_earth
+  m_Controller: {fileID: 9100000, guid: 0e2e215b776934e86a3877646362ca18, type: 2}
+  m_Clips:
+  - m_OriginalClip: {fileID: 7400000, guid: 1f40147aea3f14329b7610a5aa31cf9c, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: c4fdbf71cd1164dc891261c869ade312, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 7336ec089677b4a069b8d281c2f2f51e, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 1491cb896d96d4976aa3857c0e8ea82b, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 503a58cfabb8740eaad513cd5f67ac22, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: e153b9b9af0964a2a841fcfbf39789e7, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 45a97e262408046aabfff4b003a9ec64, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 4c0d3630b6fd8459784c16bd67c44919, type: 2}
