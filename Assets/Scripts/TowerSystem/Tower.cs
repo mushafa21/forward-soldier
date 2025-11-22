@@ -3,6 +3,7 @@ using UnityEngine;
 using PathSystem;
 using TMPro;
 using TroopSystem;
+using DG.Tweening;
 
 namespace TowerSystem
 {
@@ -35,6 +36,9 @@ namespace TowerSystem
 
         public ParticleSystem hitParticle;
         public ParticleSystem destroyParticle;
+
+        private Vector3 originalScale; // Store the original scale to ensure proper reset after animations
+
         void Start()
         {
             // Scale maxHealth based on tower level from GameManager
@@ -43,14 +47,17 @@ namespace TowerSystem
                 int towerLevel = GameManager.Instance.GetTowerLevel();
                 float healthIncreasePercentage = 0.2f; // 20% increase per level (same as in ShopUI)
                 float baseHealth = 200; // Base tower health
-                
+
                 // Calculate new max health using the same formula as in ShopUI
                 maxHealth = baseHealth * Mathf.Pow(1f + healthIncreasePercentage, towerLevel - 1);
             }
-            
+
             currentHealth = maxHealth;
             SetFactionColor();
             UpdateUI();
+
+            // Store the original scale for use in animations
+            originalScale = transform.localScale;
         }
         
 
@@ -65,6 +72,9 @@ namespace TowerSystem
                 OnTowerDestroyed();
             }
             hitParticle.Play();
+
+            // Apply squash and stretch effect when taking damage
+            ApplySquashAndStretch();
         }
 
         // Called when the tower is destroyed
@@ -144,6 +154,31 @@ namespace TowerSystem
             {
                 healthBar.UpdateBar(currentHealth,0,maxHealth);
             }
+        }
+
+        // Apply squash and stretch effect when taking damage
+        private void ApplySquashAndStretch()
+        {
+            // Stop any existing animations on this transform
+            transform.DOKill();
+
+            // Calculate a slight squash and stretch effect using the stored original scale
+            Vector3 targetSquashScale = new Vector3(originalScale.x * 0.9f, originalScale.y * 1.1f, originalScale.z); // Squash horizontally, stretch vertically
+            Vector3 targetStretchScale = new Vector3(originalScale.x * 1.1f, originalScale.y * 0.9f, originalScale.z); // Stretch horizontally, squash vertically
+
+            // Apply the effect with DOTween (squash first, then return to original)
+            // First, do a quick squash
+            transform.DOScale(targetSquashScale, 0.05f)
+                .OnComplete(() =>
+                {
+                    // Then stretch and return to original
+                    transform.DOScale(targetStretchScale, 0.05f)
+                        .OnComplete(() =>
+                        {
+                            // Return to original scale
+                            transform.DOScale(originalScale, 0.05f);
+                        });
+                });
         }
     }
 }
