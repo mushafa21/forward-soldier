@@ -3,6 +3,8 @@ using PathSystem;
 using System.Collections.Generic;
 using MoreMountains.Tools;
 using SoulSystem;
+using DG.Tweening;
+using UnityEngine.UI;
 
 namespace TroopSystem
 {
@@ -39,10 +41,14 @@ namespace TroopSystem
         public float maxHealth = 100f;
         public float currentHealth;
         public float damage = 20f;
+        public float defense = 0f;
         public float attackRange = 2f;
         public float attackCooldown = 1f;
         private float lastAttackTime = 0f;
-        private float attackAnimationTime = 0.25f; // Time for attack animation to complete before dealing damage
+        
+        [Header("Animation Settings")]
+        public float baseAttackAnimationLength = 0.5f; // Length of your attack clip in seconds (default is usually 1s)
+        public float impactPointNormalized = 0.5f; // Point in animation (0.0 to 1.0) where damage happens. 0.5 = middle.
         
         [Header("State Management")]
         public TroopState currentState = TroopState.Idle;
@@ -51,7 +57,9 @@ namespace TroopSystem
         public MMProgressBar healthBar;
         public GameObject walkParticle; // Reference to the walk particle game object
         public Animator animator; // Reference to the animator (if using animations)
-        public SpriteRenderer spriteRenderer; // *** ADD THIS ***
+        public SpriteRenderer spriteRenderer;
+        public Image classImage;
+
         public ParticleSystem spawnParticle;
         public ParticleSystem hitParticle;
         public ParticleSystem dustParticle;
@@ -63,7 +71,8 @@ namespace TroopSystem
         public Material factionMaterial; // Assign your 'Troop_ColorSwap_Material' here
         public Color playerColor = new Color(0.2f, 0.4f, 1f, 1f); // The default 'target' blue
         public Color enemyColor = new Color(1f, 0.2f, 0.2f, 1f); // The 'target' red
-        
+
+                
         [Header("Timing Settings")]
         public float deathDestroyDelay = 2f; // Time to wait before destroying after death
 
@@ -92,6 +101,9 @@ namespace TroopSystem
 
         // Flash effect when taking damage
         private Coroutine flashCoroutine; // Track the flash coroutine
+
+        // Squash and stretch effect when taking damage
+        private Vector3 originalScale; // Store the original scale to ensure proper reset after animations
         private Color originalSpriteColor = Color.white; // Store the original sprite color to restore after interruption
 
         // Awake is called before Start
@@ -144,6 +156,7 @@ namespace TroopSystem
             {
                 maxHealth = troopStats.GetHealthAtLevel(level);
                 damage = troopStats.damage;
+                defense = troopStats.defense;
                 moveSpeed = troopStats.movementSpeed;
                 attackRange = troopStats.attackRange;
                 attackCooldown = troopStats.attackCooldown;
@@ -162,9 +175,15 @@ namespace TroopSystem
 
             InitializeFactionColor();
             
+            // Store the original scale for use in animations
+            originalScale = transform.localScale;
+
+            // Set the sprite based on TroopClass
+            UpdateSpriteBasedOnClass();
+
             // Register with the troop manager
             TroopManager.Instance.AddTroop(this);
-            
+
             if (currentPath != null && currentPath.waypoints.Count > 0)
             {
                 if (faction == TroopFaction.Enemy)
@@ -181,18 +200,18 @@ namespace TroopSystem
                     transform.position = startPos;
                     currentWaypointIndex = 1; // Next waypoint to move toward
                 }
-                
+
                 // Calculate Y position offset to prevent visual stacking
                 CalculateYPositionOffset();
-                
+
                 // Update scale based on direction
                 UpdateScaleBasedOnDirection();
-                
+
                 // Switch to walk state after setting up the path
                 ChangeState(TroopState.Walk);
             }
 
-          
+
         }
 
         // *** ADD THIS NEW METHOD ***
@@ -751,12 +770,18 @@ namespace TroopSystem
         {
             if (currentHealth <= 0) return; // Already dead
 
-            currentHealth -= damageAmount;
+            // Calculate damage after defense reduction
+            float actualDamage = CalculateDamageAfterDefense(damageAmount);
+
+            currentHealth -= actualDamage;
             hitParticle.Play();
             dustParticle.Play();
 
             // Trigger flash effect when taking damage
             TriggerFlashEffect();
+
+            // Trigger squash and stretch effect when taking damage
+            ApplySquashAndStretch();
 
             if (currentHealth <= 0)
             {
@@ -835,129 +860,122 @@ namespace TroopSystem
         }
 
         // Method to change the troop's state
-        public void ChangeState(TroopState newState)
+   public void ChangeState(TroopState newState)
         {
             TroopState previousState = currentState;
             currentState = newState;
 
+            // RESET SPEED: Always reset speed to normal when leaving Attack state
+            if (animator != null) animator.speed = 1f;
+
             switch (currentState)
             {
-                case TroopState.Idle :
-                    if(animator != null && animator.runtimeAnimatorController != null) animator.SetTrigger("Idle");
-                    animator.SetBool("IsWalking",false);
-                    StopWalkSound(); // Stop walk sound when entering idle state
+                case TroopState.Idle:
+                    if (animator != null && animator.runtimeAnimatorController != null) animator.SetTrigger("Idle");
+                    animator.SetBool("IsWalking", false);
+                    StopWalkSound();
                     break;
+
                 case TroopState.Walk:
-                    if(animator != null && animator.runtimeAnimatorController != null) animator.SetBool("IsWalking",true);
-                    PlayWalkSound(); // Start walk sound when entering walk state
+                    if (animator != null && animator.runtimeAnimatorController != null) animator.SetBool("IsWalking", true);
+                    PlayWalkSound();
                     break;
+
                 case TroopState.Attack:
-                    // When entering attack state, first play attack animation
-                    StopWalkSound(); // Stop walk sound when entering attack state
-                    PlayAttackSound(); // Play attack sound when entering attack state
+                    StopWalkSound();
+                    PlayAttackSound();
 
-                    if(animator != null && animator.runtimeAnimatorController != null)
+                    if (animator != null && animator.runtimeAnimatorController != null)
                     {
-                        animator.SetBool("IsWalking",false);
-
+                        animator.SetBool("IsWalking", false);
+                        
+                        // *** FIX 1: BETTER SPEED CALCULATION ***
+                        // Only speed up if the cooldown is faster than the animation.
+                        // Never slow down (no slow-motion for heavy units), just let them wait in Idle.
+                        float requiredSpeed = 1.0f;
+                        if (attackCooldown < baseAttackAnimationLength)
+                        {
+                             requiredSpeed = baseAttackAnimationLength / attackCooldown;
+                        }
+                        
+                        animator.speed = requiredSpeed;
                         animator.SetTrigger("Attack");
+                        
+                        // *** FIX 2: IMPACT TIMING ***
+                        // Calculate time based on the ADJUSTED speed
+                        float adjustedDuration = baseAttackAnimationLength / requiredSpeed;
+                        float timeToImpact = adjustedDuration * impactPointNormalized;
+                        
+                        // Safety check
+                        timeToImpact = Mathf.Max(timeToImpact, 0.05f);
+
+                        Invoke("DealAttackDamageAndGoToIdle", timeToImpact);
                     }
-          
-                    // After animation plays, deal damage and go to idle state
-                    Invoke("DealAttackDamageAndGoToIdle", attackAnimationTime);
                     break;
+
                 case TroopState.Death:
-                    // Unregister from troop manager when dying
                     TroopManager.Instance?.RemoveTroop(this);
                     PlayDeathSound();
                     SpawnGhost();
-                    if(animator != null && animator.runtimeAnimatorController != null) animator.SetTrigger("Death");
-                    animator.SetBool("IsWalking",false);
-                    StopWalkSound(); // Stop walk sound when entering death state
-                    if (faction == TroopFaction.Player)
-                    {
-                        EnemyManager.Instance.IncreaseSouls(troopStats.soulGainedWhenDefeated);
-                    } else if (faction == TroopFaction.Enemy)
-                    {
-                        SoulManager.Instance.IncreaseSouls(troopStats.soulGainedWhenDefeated);
-                    }
+                    if (animator != null && animator.runtimeAnimatorController != null) animator.SetTrigger("Death");
+                    animator.SetBool("IsWalking", false);
+                    StopWalkSound();
+                    // if (faction == TroopFaction.Player)
+                    // {
+                    //     EnemyManager.Instance.IncreaseSouls(troopStats.soulGainedWhenDefeated);
+                    // }
+                    // else if (faction == TroopFaction.Enemy)
+                    // {
+                    //     SoulManager.Instance.IncreaseSouls(troopStats.soulGainedWhenDefeated);
+                    // }
                     break;
             }
-        }
-        
+        }     
         // Deal damage to the tower and go to idle state after attack animation completes
         void DealAttackDamageAndGoToIdle()
         {
-            if (currentState == TroopState.Attack) // Make sure we're still in attack state
+            if (currentState == TroopState.Attack)
             {
-                // Check if troop SO has a projectile prefab to use
+                // Deal Damage Logic
                 if (troopStats != null && troopStats.projectilePrefab != null)
                 {
-                    // Use projectile attack instead of direct attack
-                    if (targetTower != null)
-                    {
-                        // Check if the tower is still alive and in range
-                        if (targetTower.currentHealth > 0 && targetTower.isActiveAndEnabled)
-                        {
-                            float distanceToTower = Vector3.Distance(transform.position, targetTower.transform.position);
-                            // Add size compensation for larger towers
-                            float effectiveTowerRange = attackRange + towerSizeCompensation;
-                            if (distanceToTower <= effectiveTowerRange || hasReachedEnd)
-                            {
-                                // Spawn projectile towards the tower
-                                SpawnProjectile(targetTower.transform);
-                            }
-                        }
-                    }
-                    else if (targetTroop != null)
-                    {
-                        // Check if the target troop is still alive and in range
-                        if (targetTroop.currentHealth > 0 && targetTroop.isActiveAndEnabled)
-                        {
-                            float distanceToTroop = Vector3.Distance(transform.position, targetTroop.transform.position);
-                            if (distanceToTroop <= attackRange)
-                            {
-                                // Spawn projectile towards the target troop
-                                SpawnProjectile(targetTroop.transform);
-                            }
-                        }
-                    }
+                    if (targetTower != null && targetTower.isActiveAndEnabled) SpawnProjectile(targetTower.transform);
+                    else if (targetTroop != null && targetTroop.isActiveAndEnabled) SpawnProjectile(targetTroop.transform);
                 }
                 else
                 {
-                    // Use direct attack (original behavior) if no projectile prefab is set
-                    if (targetTower != null)
-                    {
-                        // Check if the tower is still alive and in range
-                        if (targetTower.currentHealth > 0 && targetTower.isActiveAndEnabled)
-                        {
-                            float distanceToTower = Vector3.Distance(transform.position, targetTower.transform.position);
-                            // Add size compensation for larger towers
-                            float effectiveTowerRange = attackRange + towerSizeCompensation;
-                            if (distanceToTower <= effectiveTowerRange || hasReachedEnd)
-                            {
-                                targetTower.TakeDamage(damage);
-                            }
-                        }
-                    }
-                    else if (targetTroop != null)
-                    {
-                        // Check if the target troop is still alive and in range
-                        if (targetTroop.currentHealth > 0 && targetTroop.isActiveAndEnabled)
-                        {
-                            float distanceToTroop = Vector3.Distance(transform.position, targetTroop.transform.position);
-                            if (distanceToTroop <= attackRange)
-                            {
-                                targetTroop.TakeDamage(damage);
-                            }
-                        }
-                    }
+                    if (targetTower != null && targetTower.isActiveAndEnabled) targetTower.TakeDamage(damage);
+                    else if (targetTroop != null && targetTroop.isActiveAndEnabled) targetTroop.TakeDamage(damage);
                 }
+
+                // *** FIX 3: ACCURATE COOLDOWN TRACKING ***
+                // We set the time to when the attack STARTED, not when damage hit.
+                // This ensures "Start-to-Start" timing (e.g., 0.2s cooldown means 5 hits per second regardless of animation length)
+                float timeSinceStart = (baseAttackAnimationLength / animator.speed) * impactPointNormalized;
+                lastAttackTime = Time.time - timeSinceStart;
+
+                // *** FIX 4: EXIT TO IDLE ***
+                // Calculate how much animation is left after the impact
+                float adjustedTotalDuration = baseAttackAnimationLength / animator.speed;
+                float remainingAnimationTime = adjustedTotalDuration - (adjustedTotalDuration * impactPointNormalized);
                 
-                // Update last attack time
-                lastAttackTime = Time.time;
-                
-                // Go to idle state for the remainder of cooldown
+                // If practically finished, switch now. Otherwise wait for animation to visually end.
+                if (remainingAnimationTime <= 0.02f)
+                {
+                    ChangeState(TroopState.Idle);
+                }
+                else
+                {
+                    Invoke("FinishAttackAnimation", remainingAnimationTime);
+                }
+            }
+        }
+        
+        void FinishAttackAnimation()
+        {
+            // Only switch if we are still attacking (haven't died or been interrupted)
+            if(currentState == TroopState.Attack)
+            {
                 ChangeState(TroopState.Idle);
             }
         }
@@ -1078,6 +1096,69 @@ namespace TroopSystem
 
             // Ensure we end with the original color
             spriteRenderer.color = originalColor;
+        }
+
+        // Apply squash and stretch effect when taking damage
+        private void ApplySquashAndStretch()
+        {
+            // Stop any existing animations on this transform
+            transform.DOKill();
+
+            // Calculate a slight squash and stretch effect using the stored original scale
+            Vector3 targetSquashScale = new Vector3(originalScale.x * 0.9f, originalScale.y * 1.1f, originalScale.z); // Squash horizontally, stretch vertically
+            Vector3 targetStretchScale = new Vector3(originalScale.x * 1.1f, originalScale.y * 0.9f, originalScale.z); // Stretch horizontally, squash vertically
+
+            // Apply the effect with DOTween (squash first, then return to original)
+            // First, do a quick squash
+            transform.DOScale(targetSquashScale, 0.05f)
+                .OnComplete(() =>
+                {
+                    // Then stretch and return to original
+                    transform.DOScale(targetStretchScale, 0.05f)
+                        .OnComplete(() =>
+                        {
+                            // Return to original scale
+                            transform.DOScale(originalScale, 0.05f);
+                        });
+                });
+        }
+
+        // Calculate damage after applying defense reduction
+        private float CalculateDamageAfterDefense(float incomingDamage)
+        {
+            // Calculate the damage reduction based on this troop's defense
+            float reducedDamage = incomingDamage - this.defense;
+
+            // Ensure troop receives at least 10% of the original incoming damage if defense is higher than the incoming damage
+            float minDamage = incomingDamage * 0.1f; // 10% of the original incoming damage as minimum damage
+
+            // If the reduced damage is less than the minimum, apply the minimum damage
+            float finalDamage = Mathf.Max(reducedDamage, minDamage);
+
+            // Ensure damage is never negative
+            return Mathf.Max(finalDamage, 0f);
+        }
+
+        // Update the sprite based on the troop's class
+        private void UpdateSpriteBasedOnClass()
+        {
+            if (classImage == null || troopStats == null)
+            {
+                Debug.LogWarning($"SpriteRenderer or TroopStats not assigned on {gameObject.name}");
+                return;
+            }
+
+            // Get the sprite from the centralized manager
+            Sprite classSprite = TroopClassSpriteManager.Instance?.GetSpriteForClass(troopStats.troopClass);
+
+            if (classSprite != null)
+            {
+                classImage.sprite = classSprite;
+            }
+            else
+            {
+                Debug.LogWarning($"No sprite found for TroopClass {troopStats.troopClass} in TroopClassSpriteManager");
+            }
         }
     }
 }

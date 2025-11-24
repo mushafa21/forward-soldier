@@ -544,8 +544,12 @@ MonoBehaviour:
   activeTroops: []
   maxSelectableTroops: 5
   selectableTroops:
-  - level: 1
+  - level: 0
+    troopSO: {fileID: 11400000, guid: 8a7cba5d3afdc476d843697cdf0b844d, type: 2}
+  - level: 0
     troopSO: {fileID: 11400000, guid: 611dff7e1ef934cf99405690e4ed82a3, type: 2}
+  - level: 0
+    troopSO: {fileID: 11400000, guid: 3467a60b4e19b48139a925c8128b0709, type: 2}
   troopCardPrefab: {fileID: 6044060424830333802, guid: 1ca47b67be2614bc4b333e6a650cf4c0, type: 3}
   currentSelectedTroop: {fileID: 0}
 --- !u!4 &312709620
@@ -1718,17 +1722,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02fc0fb52087f4f1caf46cb7769e5a7d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  soulRegenAmount: 5
-  soulRegenInterval: 8
+  soulRegenAmount: 3
+  soulRegenInterval: 3
   maxSouls: 50
   troopPrefab: {fileID: 5725314341104220098, guid: d847688718f954a43b0acc0f3f6d1ee4, type: 3}
   spawnEffectPrefab: {fileID: 6082654782289145535, guid: 6c6d39ddce197411b95dd85deec2c87f, type: 3}
   spawnPaths:
   - {fileID: 1518463174}
   spawnableTroops:
-  - level: 1
+  - level: 0
+    troopSO: {fileID: 11400000, guid: 3467a60b4e19b48139a925c8128b0709, type: 2}
+  - level: 0
+    troopSO: {fileID: 11400000, guid: 8a7cba5d3afdc476d843697cdf0b844d, type: 2}
+  - level: 0
     troopSO: {fileID: 11400000, guid: 611dff7e1ef934cf99405690e4ed82a3, type: 2}
-  spawnDecisionInterval: 8
+  spawnDecisionInterval: 2
 --- !u!4 &504202171
 Transform:
   m_ObjectHideFlags: 0
@@ -36231,9 +36239,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9684f82eaafb544bf986c68bd9477984, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  soulsPerInterval: 5
-  intervalTime: 2
-  maxSouls: 50
+  soulsPerInterval: 3
+  intervalTime: 3
+  maxSouls: 15
 --- !u!4 &2108483809
 Transform:
   m_ObjectHideFlags: 0

@@ -20,7 +20,18 @@ namespace TowerSystem
         
         [Header("Tower Health")]
         public float maxHealth = 1000f;
+
+        public float defense = 10f;
         public float currentHealth;
+
+        [Header("Tower Combat")]
+        public float attackDamage = 50f;
+        public float attackRange = 5f;
+        public float attackCooldown = 2f;
+        public GameObject projectilePrefab;
+        public float projectileSpeed = 10f;
+        private float lastAttackTime = 0f;
+        private TroopSystem.Troop targetTroop = null;
         
         [Header("Visual")]
         public TextMeshProUGUI healthText;
@@ -41,17 +52,6 @@ namespace TowerSystem
 
         void Start()
         {
-            // Scale maxHealth based on tower level from GameManager
-            if (faction == TowerFaction.Player && GameManager.Instance != null)
-            {
-                int towerLevel = GameManager.Instance.GetTowerLevel();
-                float healthIncreasePercentage = 0.2f; // 20% increase per level (same as in ShopUI)
-                float baseHealth = 200; // Base tower health
-
-                // Calculate new max health using the same formula as in ShopUI
-                maxHealth = baseHealth * Mathf.Pow(1f + healthIncreasePercentage, towerLevel - 1);
-            }
-
             currentHealth = maxHealth;
             SetFactionColor();
             UpdateUI();
@@ -64,7 +64,7 @@ namespace TowerSystem
         // Take damage from attacks
         public void TakeDamage(float damage)
         {
-            currentHealth -= damage;
+            currentHealth -= damage - defense;
             UpdateUI();
             if (currentHealth <= 0)
             {
@@ -153,6 +153,98 @@ namespace TowerSystem
             if (healthBar != null)
             {
                 healthBar.UpdateBar(currentHealth,0,maxHealth);
+            }
+        }
+
+        // Find the closest enemy troop in range
+        private TroopSystem.Troop FindClosestEnemyTroop()
+        {
+            // Get all active troops from the manager
+            System.Collections.Generic.List<TroopSystem.Troop> allTroops = TroopManager.Instance.GetAllTroops();
+
+            TroopSystem.Troop closestTroop = null;
+            float closestDistance = float.MaxValue;
+
+            foreach (TroopSystem.Troop troop in allTroops)
+            {
+                // Check if the troop is active, not dead, and of opposite faction
+                if (troop != null && troop.currentHealth > 0 && IsOppositeFactionTroop(troop))
+                {
+                    float distance = Vector3.Distance(transform.position, troop.transform.position);
+                    if (distance < attackRange && distance < closestDistance)
+                    {
+                        closestDistance = distance;
+                        closestTroop = troop;
+                    }
+                }
+            }
+
+            return closestTroop;
+        }
+
+        // Check if the target troop is of opposite faction
+        bool IsOppositeFactionTroop(TroopSystem.Troop otherTroop)
+        {
+            if (otherTroop == null) return false;
+
+            switch (faction)
+            {
+                case TowerFaction.Player:
+                    return otherTroop.faction == TroopFaction.Enemy;
+                case TowerFaction.Enemy:
+                    return otherTroop.faction == TroopFaction.Player;
+                default:
+                    return false;
+            }
+        }
+
+        // Spawn projectile towards a target
+        private void SpawnProjectile(Transform target)
+        {
+            if (projectilePrefab != null)
+            {
+                // Spawn the projectile at the current tower's position
+                GameObject projectileObj = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
+
+                // Get the projectile component and initialize it
+                TroopSystem.Projectile projectile = projectileObj.GetComponent<TroopSystem.Projectile>();
+                if (projectile != null)
+                {
+                    // Initialize with target, source tower (as the source troop), damage and speed
+                    projectile.Initialize(target, null, attackDamage, projectileSpeed);
+                }
+            }
+        }
+
+        void Update()
+        {
+            // Only attack if it's time to attack again
+            if (Time.time - lastAttackTime >= attackCooldown)
+            {
+                // Find a new target if we don't have one or if the current target is out of range/invalid
+                if (targetTroop == null || targetTroop.currentHealth <= 0 || !targetTroop.isActiveAndEnabled ||
+                    Vector3.Distance(transform.position, targetTroop.transform.position) > attackRange)
+                {
+                    targetTroop = FindClosestEnemyTroop();
+                }
+
+                // If we have a valid target, attack it
+                if (targetTroop != null)
+                {
+                    // Check if the target is still valid
+                    if (targetTroop.currentHealth > 0 && targetTroop.isActiveAndEnabled &&
+                        Vector3.Distance(transform.position, targetTroop.transform.position) <= attackRange)
+                    {
+                        // Attack the target by spawning a projectile
+                        SpawnProjectile(targetTroop.transform);
+                        lastAttackTime = Time.time;
+                    }
+                    else
+                    {
+                        // Target is no longer valid, clear it
+                        targetTroop = null;
+                    }
+                }
             }
         }
 

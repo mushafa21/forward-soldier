@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d5074b98d1f47b9a196d2fc4f664f3c, type: 3}
+  m_Name: Troop Spearman
+  m_EditorClassIdentifier: 
+  health: 190
+  damage: 12
+  defense: 15
+  attackRange: 1
+  movementSpeed: 3
+  speedCategory: NORMAL
+  attackCooldown: 1.5
+  spawnCooldown: 3
+  soulCost: 4
+  soulGainedWhenDefeated: 1
+  projectilePrefab: {fileID: 0}
+  projectileSpeed: 0
+  troopClass: 1
+  name: SPEARMAN
+  potrait: {fileID: 2162766994774161030, guid: f460a181875bc40769aba5bb027d5b07, type: 3}
+  walkSound: {fileID: 8300000, guid: 3faf9124e537748d99ead1cb8d03ba6d, type: 3}
+  hitSound: {fileID: 8300000, guid: 7fd4a0bb348c34d6b83e244087845ee7, type: 3}
+  allyDeathSound: {fileID: 8300000, guid: d424b7eaa40aa4be9bad385bbadac7f0, type: 3}
+  enemyDeathSound: {fileID: 8300000, guid: 421a7129338a844718e6b445cba3a448, type: 3}
+  animatorController: {fileID: 22100000, guid: 34197753962c24064a749b6fd68751d2, type: 2}
