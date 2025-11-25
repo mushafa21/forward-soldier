@@ -122,6 +122,8 @@ public class ShopItemUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         {
             isShowingDescription = true;
             descriptionObject.SetActive(true);
+            descriptionObject.GetComponent<SlideInAnimator>().ShowSlideIn();
+
         }
     }
 

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d5074b98d1f47b9a196d2fc4f664f3c, type: 3}
   m_Name: Troop Shield
   m_EditorClassIdentifier: 
-  health: 250
+  health: 220
   damage: 16
   defense: 20
   attackRange: 1
@@ -25,7 +25,9 @@ MonoBehaviour:
   projectilePrefab: {fileID: 0}
   projectileSpeed: 10
   troopClass: 1
+  isMagic: 0
   name: KNIGHT
+  description: An unbreakable iron wall that shrugs off all but the heaviest hits.
   potrait: {fileID: 6827581200123067571, guid: 7316a6df23c804849bdae4d88eaa9100, type: 3}
   walkSound: {fileID: 8300000, guid: 3faf9124e537748d99ead1cb8d03ba6d, type: 3}
   hitSound: {fileID: 8300000, guid: 7fd4a0bb348c34d6b83e244087845ee7, type: 3}

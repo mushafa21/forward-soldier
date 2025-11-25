@@ -25,7 +25,9 @@ MonoBehaviour:
   projectilePrefab: {fileID: 6865045246375794713, guid: b777dc9dc4de44e5982e0c4d747447cc, type: 3}
   projectileSpeed: 15
   troopClass: 2
+  isMagic: 0
   name: ARCHER
+  description: Rains arrows from afar but falls quickly if reached.
   potrait: {fileID: -224118290974663462, guid: 22f138648bd5e412dbbd76234451e2f3, type: 3}
   walkSound: {fileID: 8300000, guid: 3faf9124e537748d99ead1cb8d03ba6d, type: 3}
   hitSound: {fileID: 8300000, guid: 83e12bc2a9e7c466f85a0a9056f121ef, type: 3}

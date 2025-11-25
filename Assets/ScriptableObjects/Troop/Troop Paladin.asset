@@ -12,17 +12,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d5074b98d1f47b9a196d2fc4f664f3c, type: 3}
   m_Name: Troop Paladin
   m_EditorClassIdentifier: 
-  health: 100
-  damage: 20
+  health: 200
+  damage: 25
+  defense: 15
   attackRange: 1
   movementSpeed: 5
   speedCategory: FAST
   attackCooldown: 1
-  spawnCooldown: 9
-  soulCost: 10
+  spawnCooldown: 6
+  soulCost: 6
   soulGainedWhenDefeated: 3
   projectilePrefab: {fileID: 0}
   projectileSpeed: 10
+  troopClass: 1
+  isMagic: 0
   name: PALADIN
   potrait: {fileID: 7422181605936378285, guid: 21c30d834634f4437b94fd56ba1ea297, type: 3}
   walkSound: {fileID: 8300000, guid: 3faf9124e537748d99ead1cb8d03ba6d, type: 3}

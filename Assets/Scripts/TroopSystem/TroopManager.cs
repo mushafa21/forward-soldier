@@ -13,18 +13,20 @@ public class TroopLevel
 public class TroopManager : MonoBehaviour
 {
     [Header("Troop Management")] public List<Troop> activeTroops = new List<Troop>();
-    
+
     [Header("Shop Settings")]
-    public int maxSelectableTroops = 5; // Maximum number of troops that can be in the shop
+    public int maxSelectableTroops = 5; // Maximum number of troops that can be used
 
     private static TroopManager instance;
-    public List<TroopLevel> selectableTroops = new List<TroopLevel>();
+    public List<TroopSO> selectableTroops = new List<TroopSO>();
     public GameObject troopCardPrefab;
     private List<TroopCardUI> _troopCards;
     public TroopCardUI currentSelectedTroop;
     private GameObject troopCardContainer;
-    
-    
+
+    private bool _battleStarted = false; // Track if battle has started
+
+
     public static TroopManager Instance
     {
         get
@@ -48,25 +50,46 @@ public class TroopManager : MonoBehaviour
 
     private void Start()
     {
+        // Initially disable the TroopManager during battle preparation
+        this.enabled = false;
+
         troopCardContainer = GameManager.Instance.troopContainer;
         _troopCards = new List<TroopCardUI>();
-        
+
         // Clear all existing troop card children
         foreach (Transform child in troopCardContainer.transform)
         {
             Destroy(child.gameObject);
         }
-        
+
         // Create troop cards based on selectableTroops
-        foreach (TroopLevel troopLevel in selectableTroops)
+        foreach (TroopSO troopSO in selectableTroops)
         {
             GameObject troopCardObj = Instantiate(troopCardPrefab, troopCardContainer.transform);
             TroopCardUI troopCardUI = troopCardObj.GetComponent<TroopCardUI>();
-            
+
             if (troopCardUI != null)
             {
-                troopCardUI.SetTroop(troopLevel.troopSO, troopLevel.level);
+                troopCardUI.SetTroop(troopSO, 1); // Use level 1 since level feature is removed
+                // Mark as not in battle preparation initially
+                troopCardUI.SetInBattlePreparation(false);
                 _troopCards.Add(troopCardUI);
+            }
+        }
+    }
+
+    // Method called when battle starts
+    public void StartBattle()
+    {
+        _battleStarted = true;
+        this.enabled = true; // Enable TroopManager for battle
+
+        // Update all troop cards that battle has started
+        foreach (var troopCard in _troopCards)
+        {
+            if (troopCard != null)
+            {
+                troopCard.OnBattleStart();
             }
         }
     }
@@ -188,14 +211,14 @@ public class TroopManager : MonoBehaviour
             _troopCards.Clear();
 
             // Create troop cards based on selectableTroops
-            foreach (TroopLevel troopLevel in selectableTroops)
+            foreach (TroopSO troopSO in selectableTroops)
             {
                 GameObject troopCardObj = Instantiate(troopCardPrefab, troopCardContainer.transform);
                 TroopCardUI troopCardUI = troopCardObj.GetComponent<TroopCardUI>();
 
                 if (troopCardUI != null)
                 {
-                    troopCardUI.SetTroop(troopLevel.troopSO, troopLevel.level);
+                    troopCardUI.SetTroop(troopSO, 1); // Use level 1 since level feature is removed
                     _troopCards.Add(troopCardUI);
                 }
             }
@@ -205,19 +228,9 @@ public class TroopManager : MonoBehaviour
     public void RemoveTroopFromShop(TroopCardUI troopCardUI)
     {
         // Find and remove the troop from selectableTroops
-        TroopLevel troopToRemove = null;
-        foreach (TroopLevel troopLevel in selectableTroops)
+        if (selectableTroops.Contains(troopCardUI.troopSO))
         {
-            if (troopLevel.troopSO == troopCardUI.troopSO)
-            {
-                troopToRemove = troopLevel;
-                break;
-            }
-        }
-        
-        if (troopToRemove != null)
-        {
-            selectableTroops.Remove(troopToRemove);
+            selectableTroops.Remove(troopCardUI.troopSO);
             // Refresh the troop cards to reflect the change
             RefreshTroopCards();
         }

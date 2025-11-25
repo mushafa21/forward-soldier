@@ -491,13 +491,13 @@ MonoBehaviour:
   - level: 1
     troopSO: {fileID: 11400000, guid: 3467a60b4e19b48139a925c8128b0709, type: 2}
   - level: 1
-    troopSO: {fileID: 11400000, guid: 8a7cba5d3afdc476d843697cdf0b844d, type: 2}
-  - level: 1
     troopSO: {fileID: 11400000, guid: 611dff7e1ef934cf99405690e4ed82a3, type: 2}
   - level: 1
-    troopSO: {fileID: 11400000, guid: b863e4c1c932d4327a5815d12231a42a, type: 2}
+    troopSO: {fileID: 11400000, guid: 8a7cba5d3afdc476d843697cdf0b844d, type: 2}
   - level: 1
-    troopSO: {fileID: 11400000, guid: e8a18f27bbefc45ef83f2061fb231664, type: 2}
+    troopSO: {fileID: 11400000, guid: 32c4ebd08d3e84b1c8d4fe286b573e1b, type: 2}
+  - level: 1
+    troopSO: {fileID: 11400000, guid: 5df4e12f438a5494a8f6a61450d5301b, type: 2}
   troopCardPrefab: {fileID: 6044060424830333802, guid: 1ca47b67be2614bc4b333e6a650cf4c0, type: 3}
   currentSelectedTroop: {fileID: 0}
 --- !u!4 &312709620
@@ -1492,7 +1492,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02fc0fb52087f4f1caf46cb7769e5a7d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  soulRegenAmount: 3
+  soulRegenAmount: 10
   soulRegenInterval: 3
   maxSouls: 15
   troopPrefab: {fileID: 5725314341104220098, guid: d847688718f954a43b0acc0f3f6d1ee4, type: 3}
@@ -1501,17 +1501,17 @@ MonoBehaviour:
   - {fileID: 1518463174}
   - {fileID: 1038934588}
   spawnableTroops:
-  - level: 1
-    troopSO: {fileID: 11400000, guid: b863e4c1c932d4327a5815d12231a42a, type: 2}
-  - level: 1
-    troopSO: {fileID: 11400000, guid: 3467a60b4e19b48139a925c8128b0709, type: 2}
-  - level: 1
+  - level: 0
+    troopSO: {fileID: 11400000, guid: 810ff4ff7224d44de8222cc5c578d9de, type: 2}
+  - level: 0
+    troopSO: {fileID: 11400000, guid: 8a7cba5d3afdc476d843697cdf0b844d, type: 2}
+  - level: 0
+    troopSO: {fileID: 11400000, guid: 9daf5949834484adfaf95ec54e6fe5c3, type: 2}
+  - level: 0
+    troopSO: {fileID: 11400000, guid: 9daf5949834484adfaf95ec54e6fe5c3, type: 2}
+  - level: 0
     troopSO: {fileID: 11400000, guid: 5df4e12f438a5494a8f6a61450d5301b, type: 2}
-  - level: 1
-    troopSO: {fileID: 11400000, guid: 611dff7e1ef934cf99405690e4ed82a3, type: 2}
-  - level: 1
-    troopSO: {fileID: 11400000, guid: e8a18f27bbefc45ef83f2061fb231664, type: 2}
-  spawnDecisionInterval: 1
+  spawnDecisionInterval: 3
 --- !u!4 &504202171
 Transform:
   m_ObjectHideFlags: 0

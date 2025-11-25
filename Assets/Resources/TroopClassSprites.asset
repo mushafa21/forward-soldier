@@ -15,3 +15,9 @@ MonoBehaviour:
   redClassSprite: {fileID: 5162361765803036030, guid: 74ada3e9ae7d34d20abc0a9b38153cf2, type: 3}
   greenClassSprite: {fileID: -6780947363454663135, guid: 967ee21b8726b4baeb16ea0171f4948d, type: 3}
   blueClassSprite: {fileID: 1890158840036245338, guid: 7d39b92bdc8be48e6879e37987481040, type: 3}
+  redClassName: BREAKER
+  greenClassName: DEFENDER
+  blueClassName: SKIRMISHER
+  redClassColor: {r: 0.92941177, g: 0.10980392, b: 0.14509805, a: 0}
+  greenClassColor: {r: 0.13333334, g: 0.69411767, b: 0.29803923, a: 0}
+  blueClassColor: {r: 0.3019608, g: 0.42745098, b: 0.9529412, a: 0}

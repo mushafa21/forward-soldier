@@ -31,6 +31,9 @@ public class GameManager : MonoBehaviour
     [Header("Enemy Level")]
     public int enemyLevel = 0; // Level of enemy difficulty, increases after completing all levels
 
+    public List<TroopSO> enemyTroops = new List<TroopSO>();
+    public List<TroopSO> unlockedTroops = new List<TroopSO>();
+
     public static GameManager Instance
     {
         get

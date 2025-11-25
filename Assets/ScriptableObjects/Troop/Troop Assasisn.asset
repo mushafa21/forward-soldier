@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d5074b98d1f47b9a196d2fc4f664f3c, type: 3}
   m_Name: Troop Assasisn
   m_EditorClassIdentifier: 
-  health: 85
+  health: 95
   damage: 16
   defense: 0
   attackRange: 1
@@ -25,7 +25,9 @@ MonoBehaviour:
   projectilePrefab: {fileID: 0}
   projectileSpeed: 0
   troopClass: 2
+  isMagic: 0
   name: ASSASSIN
+  description: Rapid-striking killer that melts unarmored targets instantly.
   potrait: {fileID: -8562148360649723391, guid: af81b220be3f44a239ee42e5ef1964d5, type: 3}
   walkSound: {fileID: 8300000, guid: 3faf9124e537748d99ead1cb8d03ba6d, type: 3}
   hitSound: {fileID: 8300000, guid: 7fd4a0bb348c34d6b83e244087845ee7, type: 3}

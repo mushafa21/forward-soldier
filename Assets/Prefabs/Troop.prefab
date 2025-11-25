@@ -12334,7 +12334,7 @@ Animator:
   m_GameObject: {fileID: 5725314341104220098}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 22100000, guid: 71db8316999dc41ce8953c8d58718f7c, type: 2}
+  m_Controller: {fileID: 9100000, guid: 0e2e215b776934e86a3877646362ca18, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -12372,6 +12372,7 @@ MonoBehaviour:
   attackCooldown: 1
   baseAttackAnimationLength: 1
   impactPointNormalized: 0.5
+  minAttackSoundInterval: 0.35
   currentState: 0
   healthBar: {fileID: 4053416975740921155}
   walkParticle: {fileID: 2826998106500922648}

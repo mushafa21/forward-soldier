@@ -19,25 +19,17 @@ public class EnemyManager : MonoBehaviour
     public GameObject spawnEffectPrefab; // Prefab of the troop to spawn
 
     public List<LanePath> spawnPaths = new List<LanePath>(); // List of paths where the enemy can spawn troops
-    public List<TroopLevel> spawnableTroops = new List<TroopLevel>(); // List of troops the enemy can spawn
+    public List<TroopSO> spawnableTroops = new List<TroopSO>(); // List of troops the enemy can spawn
     public float spawnDecisionInterval = 5f; // Time in seconds between spawn decisions
 
     private bool isInitialized = false;
+    private bool isBattlePreparationPhase = true; // Initially in battle preparation
 
     private static EnemyManager instance;
     public static EnemyManager Instance
     {
         get
         {
-            if (instance == null)
-            {
-                instance = FindObjectOfType<EnemyManager>();
-                if (instance == null)
-                {
-                    GameObject obj = new GameObject("EnemyManager");
-                    instance = obj.AddComponent<EnemyManager>();
-                }
-            }
             return instance;
         }
     }
@@ -56,6 +48,7 @@ public class EnemyManager : MonoBehaviour
 
     private void Start()
     {
+        GameManager.Instance.enemyTroops = spawnableTroops;
         InitializeEnemyManager();
     }
 
@@ -66,7 +59,7 @@ public class EnemyManager : MonoBehaviour
         currentSouls = 0f; // Start with 0 souls
         isInitialized = true;
 
-        // Start the enemy logic coroutines
+        // Start the enemy logic coroutines (they will check battle phase internally)
         StartCoroutine(SoulRegenCoroutine());
         StartCoroutine(EnemyActionCoroutine());
     }
@@ -76,7 +69,7 @@ public class EnemyManager : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(soulRegenInterval);
-            if (isInitialized)
+            if (isInitialized && !isBattlePreparationPhase)
             {
                 currentSouls = Mathf.Min(maxSouls, currentSouls + soulRegenAmount);
                 Debug.Log("Enemy souls regenerated: " + currentSouls);
@@ -89,7 +82,7 @@ public class EnemyManager : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(spawnDecisionInterval);
-            if (isInitialized)
+            if (isInitialized && !isBattlePreparationPhase)
             {
                 PerformEnemyAction();
             }
@@ -113,41 +106,41 @@ public class EnemyManager : MonoBehaviour
             return;
 
         // Find a valid troop to spawn based on available souls
-        TroopLevel troopToSpawn = GetAffordableTroop();
+        TroopSO troopToSpawn = GetAffordableTroop();
 
-        if (troopToSpawn != null && currentSouls >= troopToSpawn.troopSO.soulCost)
+        if (troopToSpawn != null && currentSouls >= troopToSpawn.soulCost)
         {
             // Select a random path
             LanePath selectedPath = spawnPaths[Random.Range(0, spawnPaths.Count)];
-            
+
             // Add enemy level bonus to the troop level
             int enemyLevel = GameManager.Instance != null ? GameManager.Instance.GetEnemyLevel() : 0;
-            int troopSpawnLevel = troopToSpawn.level + enemyLevel;
-            
+            int troopSpawnLevel = 1 + enemyLevel; // Default to level 1, plus enemy level
+
             // Spawn the troop at the selected path
-            SpawnTroop(troopToSpawn.troopSO, selectedPath, troopSpawnLevel);
+            SpawnTroop(troopToSpawn, selectedPath, troopSpawnLevel);
         }
         // If no affordable troop is found, the enemy will wait until it has more souls
     }
 
-    private TroopLevel GetAffordableTroop()
+    private TroopSO GetAffordableTroop()
     {
-        List<TroopLevel> affordableTroops = new List<TroopLevel>();
-        
-        foreach (TroopLevel troopLevel in spawnableTroops)
+        List<TroopSO> affordableTroops = new List<TroopSO>();
+
+        foreach (TroopSO troopSO in spawnableTroops)
         {
-            if (currentSouls >= troopLevel.troopSO.soulCost)
+            if (currentSouls >= troopSO.soulCost)
             {
-                affordableTroops.Add(troopLevel);
+                affordableTroops.Add(troopSO);
             }
         }
-        
+
         if (affordableTroops.Count > 0)
         {
             // Return a random affordable troop
             return affordableTroops[Random.Range(0, affordableTroops.Count)];
         }
-        
+
         return null; // No affordable troops
     }
 
@@ -197,5 +190,11 @@ public class EnemyManager : MonoBehaviour
     public void DecreaseSouls(float amount)
     {
         currentSouls = Mathf.Max(0, currentSouls - amount);
+    }
+
+    // Method to start the actual battle (called by LevelManager)
+    public void StartBattle()
+    {
+        isBattlePreparationPhase = false;
     }
 }

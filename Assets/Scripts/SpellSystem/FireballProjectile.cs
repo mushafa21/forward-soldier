@@ -83,7 +83,7 @@ namespace SpellSystem
                     float distance = Vector3.Distance(center, troop.transform.position);
                     if (distance <= radius)
                     {
-                        troop.TakeDamage(damage);
+                        troop.TakeDamage(damage, true); // Magic attack ignores defense
                     }
                 }
             }

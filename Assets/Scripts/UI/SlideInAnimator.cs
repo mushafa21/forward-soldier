@@ -81,6 +81,6 @@ public class SlideInAnimator : MonoBehaviour
     
     private void OnEnable()
     {
-        ShowSlideIn();
+        // ShowSlideIn();
     }
 }

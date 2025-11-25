@@ -12,18 +12,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d5074b98d1f47b9a196d2fc4f664f3c, type: 3}
   m_Name: Troop Halberd
   m_EditorClassIdentifier: 
-  health: 50
-  damage: 20
+  health: 120
+  damage: 45
+  defense: 2
   attackRange: 1.5
-  movementSpeed: 2
-  speedCategory: SLOW
-  attackCooldown: 1.5
-  spawnCooldown: 2
-  soulCost: 5
-  soulGainedWhenDefeated: 2
+  movementSpeed: 3
+  speedCategory: NORMAL
+  attackCooldown: 1.7
+  spawnCooldown: 3
+  soulCost: 3
+  soulGainedWhenDefeated: 1
   projectilePrefab: {fileID: 0}
   projectileSpeed: 0
-  name: HALBERDMAN
+  troopClass: 0
+  isMagic: 0
+  name: HALBERDIER
+  description: Heavy polearm infantry that crushes armored foes.
   potrait: {fileID: 7615383899009855311, guid: 85bc489252fc44d3db6959518766fa7e, type: 3}
   walkSound: {fileID: 8300000, guid: 3faf9124e537748d99ead1cb8d03ba6d, type: 3}
   hitSound: {fileID: 8300000, guid: 7fd4a0bb348c34d6b83e244087845ee7, type: 3}

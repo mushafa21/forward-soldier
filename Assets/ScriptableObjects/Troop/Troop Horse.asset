@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Troop Horse
   m_EditorClassIdentifier: 
   health: 180
-  damage: 34
-  defense: 4
+  damage: 50
+  defense: 2
   attackRange: 1
   movementSpeed: 5
   speedCategory: FAST
@@ -25,7 +25,9 @@ MonoBehaviour:
   projectilePrefab: {fileID: 0}
   projectileSpeed: 10
   troopClass: 0
+  isMagic: 0
   name: CAVALIER
+  description: A fast raider that rushes to the battlefield quickly
   potrait: {fileID: 7610656155742541291, guid: 96f2a791598834d4e8794134978e72fd, type: 3}
   walkSound: {fileID: 8300000, guid: 3faf9124e537748d99ead1cb8d03ba6d, type: 3}
   hitSound: {fileID: 8300000, guid: 7fd4a0bb348c34d6b83e244087845ee7, type: 3}

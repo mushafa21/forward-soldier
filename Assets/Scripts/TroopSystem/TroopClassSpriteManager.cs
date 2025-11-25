@@ -9,6 +9,19 @@ public class TroopClassSpriteManager : ScriptableObject
     public Sprite redClassSprite;
     public Sprite greenClassSprite;
     public Sprite blueClassSprite;
+    
+    
+    [Header("Class Names")]
+    public string redClassName;
+    public string greenClassName;
+    public string blueClassName;
+    
+    
+    [Header("Class Colors")]
+    public Color redClassColor;
+    public Color greenClassColor;
+    public Color blueClassColor;
+
 
     // Singleton instance property
     public static TroopClassSpriteManager Instance
@@ -43,6 +56,36 @@ public class TroopClassSpriteManager : ScriptableObject
                 return blueClassSprite;
             default:
                 return null;
+        }
+    }
+    
+    public string GetNameForClass(TroopClass troopClass)
+    {
+        switch (troopClass)
+        {
+            case TroopClass.Red:
+                return redClassName;
+            case TroopClass.Green:
+                return greenClassName;
+            case TroopClass.Blue:
+                return blueClassName;
+            default:
+                return null;
+        }
+    }
+    
+    public Color GetColorForClass(TroopClass troopClass)
+    {
+        switch (troopClass)
+        {
+            case TroopClass.Red:
+                return redClassColor;
+            case TroopClass.Green:
+                return greenClassColor;
+            case TroopClass.Blue:
+                return blueClassColor;
+            default:
+                return redClassColor;
         }
     }
 }

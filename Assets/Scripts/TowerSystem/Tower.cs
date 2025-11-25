@@ -62,9 +62,16 @@ namespace TowerSystem
         
 
         // Take damage from attacks
-        public void TakeDamage(float damage)
+        public void TakeDamage(float damage, bool isMagicAttack = false)
         {
-            currentHealth -= damage - defense;
+            float damageToApply = damage;
+            if (!isMagicAttack)
+            {
+                // Apply defense reduction only for non-magic attacks
+                damageToApply = damage - defense;
+            }
+
+            currentHealth -= damageToApply;
             UpdateUI();
             if (currentHealth <= 0)
             {

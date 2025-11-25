@@ -50,6 +50,12 @@ namespace TroopSystem
         public float baseAttackAnimationLength = 0.5f; // Length of your attack clip in seconds (default is usually 1s)
         public float impactPointNormalized = 0.5f; // Point in animation (0.0 to 1.0) where damage happens. 0.5 = middle.
         
+        [Header("Audio Settings")]
+        // Prevents sounds from playing too fast. 
+        // 0.35f means the sound plays max ~3 times per second, even if attack is faster.
+        public float minAttackSoundInterval = 0.35f; 
+        private float lastAttackSoundTime = -1f;
+        
         [Header("State Management")]
         public TroopState currentState = TroopState.Idle;
         
@@ -154,7 +160,7 @@ namespace TroopSystem
             // Initialize stats from ScriptableObject if provided
             if (troopStats != null)
             {
-                maxHealth = troopStats.GetHealthAtLevel(level);
+                maxHealth = troopStats.health;
                 damage = troopStats.damage;
                 defense = troopStats.defense;
                 moveSpeed = troopStats.movementSpeed;
@@ -766,12 +772,12 @@ namespace TroopSystem
         }
 
         // Take damage from attacks
-        public void TakeDamage(float damageAmount)
+        public void TakeDamage(float damageAmount, bool isMagicAttack = false)
         {
             if (currentHealth <= 0) return; // Already dead
 
             // Calculate damage after defense reduction
-            float actualDamage = CalculateDamageAfterDefense(damageAmount);
+            float actualDamage = CalculateDamageAfterDefense(damageAmount, isMagicAttack);
 
             currentHealth -= actualDamage;
             hitParticle.Play();
@@ -805,6 +811,9 @@ namespace TroopSystem
                 // If we're not already playing walk sound, start it
                 if (!isWalkingSoundPlaying)
                 {
+                    // RESET PITCH: Important because Attack randomizes it!
+                    audioSource.pitch = 1f; 
+                    
                     audioSource.clip = troopStats.walkSound;
                     audioSource.loop = true;
                     audioSource.Play();
@@ -827,14 +836,34 @@ namespace TroopSystem
         // Play attack sound once
         private void PlayAttackSound()
         {
-            AudioManager.Instance.PlaySFX(troopStats.hitSound);
+            // 1. DUPLICATE CHECK: 
+            // You were calling both AudioManager AND local AudioSource. 
+            // I commented out AudioManager to prevent "echo/phasing" effects.
+            // AudioManager.Instance.PlaySFX(troopStats.hitSound); 
+
+            // 2. THROTTLING:
+            // If we played a sound very recently, skip this one.
+            // For Assassin (0.2s speed), this will play sound on Hit 1, Skip Hit 2, Play Hit 3.
+            // This sounds much cleaner.
+            if (Time.time - lastAttackSoundTime < minAttackSoundInterval)
+            {
+                return;
+            }
+
             if (audioSource != null && troopStats != null && troopStats.hitSound != null)
             {
                 // Stop any looping sounds (like walk sound) before playing attack sound
                 audioSource.loop = false;
                 
+                // 3. PITCH VARIATION:
+                // Randomize pitch slightly (0.9 to 1.1) so it doesn't sound like a robot machine gun.
+                audioSource.pitch = Random.Range(0.9f, 1.1f);
+                
                 // Set the attack sound clip and play it once
                 audioSource.PlayOneShot(troopStats.hitSound);
+                
+                // Mark the time
+                lastAttackSoundTime = Time.time;
             }
         }
         
@@ -944,8 +973,9 @@ namespace TroopSystem
                 }
                 else
                 {
-                    if (targetTower != null && targetTower.isActiveAndEnabled) targetTower.TakeDamage(damage);
-                    else if (targetTroop != null && targetTroop.isActiveAndEnabled) targetTroop.TakeDamage(damage);
+                    bool isMagicAttack = troopStats != null && troopStats.isMagic;
+                    if (targetTower != null && targetTower.isActiveAndEnabled) targetTower.TakeDamage(damage, isMagicAttack);
+                    else if (targetTroop != null && targetTroop.isActiveAndEnabled) targetTroop.TakeDamage(damage, isMagicAttack);
                 }
 
                 // *** FIX 3: ACCURATE COOLDOWN TRACKING ***
@@ -1124,9 +1154,15 @@ namespace TroopSystem
         }
 
         // Calculate damage after applying defense reduction
-        private float CalculateDamageAfterDefense(float incomingDamage)
+        private float CalculateDamageAfterDefense(float incomingDamage, bool isMagicAttack = false)
         {
-            // Calculate the damage reduction based on this troop's defense
+            // If the attack is magic, ignore defense
+            if (isMagicAttack)
+            {
+                return Mathf.Max(incomingDamage, incomingDamage);
+            }
+
+            // For non-magic attacks, calculate the damage reduction based on this troop's defense
             float reducedDamage = incomingDamage - this.defense;
 
             // Ensure troop receives at least 10% of the original incoming damage if defense is higher than the incoming damage

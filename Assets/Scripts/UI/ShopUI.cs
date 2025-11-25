@@ -148,14 +148,16 @@ public class ShopUI : MonoBehaviour
     
     bool TroopAlreadyExists(TroopSO troopSO)
     {
-        foreach (TroopLevel troopLevel in TroopManager.Instance.selectableTroops)
-        {
-            if (troopLevel.troopSO == troopSO)
-            {
-                return true;
-            }
-        }
+        // foreach (TroopLevel troopLevel in TroopManager.Instance.selectableTroops)
+        // {
+        //     if (troopLevel.troopSO == troopSO)
+        //     {
+        //         return true;
+        //     }
+        // }
+        // return false;
         return false;
+
     }
     
     void RemovePurchasedItem(ShopItemUI purchasedItemUI)
@@ -295,34 +297,34 @@ public class ShopUI : MonoBehaviour
         bool troopExists = false;
         int existingIndex = -1;
         
-        for (int i = 0; i < TroopManager.Instance.selectableTroops.Count; i++)
-        {
-            if (TroopManager.Instance.selectableTroops[i].troopSO == troopSO)
-            {
-                troopExists = true;
-                existingIndex = i;
-                break;
-            }
-        }
+        // for (int i = 0; i < TroopManager.Instance.selectableTroops.Count; i++)
+        // {
+        //     if (TroopManager.Instance.selectableTroops[i].troopSO == troopSO)
+        //     {
+        //         troopExists = true;
+        //         existingIndex = i;
+        //         break;
+        //     }
+        // }
 
-        if (troopExists)
-        {
-            // If troop exists, increase its level by 1
-            TroopManager.Instance.selectableTroops[existingIndex].level++;
-            
-            Debug.Log($"Added level to existing troop: {troopSO.name}. New level: {TroopManager.Instance.selectableTroops[existingIndex].level}");
-        }
-        else
-        {
-            // If troop doesn't exist, add it to selectable troops at level 1
-            TroopLevel newTroopLevel = new TroopLevel();
-            newTroopLevel.troopSO = troopSO;
-            newTroopLevel.level = 1;
-            
-            TroopManager.Instance.selectableTroops.Add(newTroopLevel);
-            
-            Debug.Log($"Added new troop to shop: {troopSO.name} at level 1");
-        }
+        // if (troopExists)
+        // {
+        //     // If troop exists, increase its level by 1
+        //     TroopManager.Instance.selectableTroops[existingIndex].level++;
+        //     
+        //     Debug.Log($"Added level to existing troop: {troopSO.name}. New level: {TroopManager.Instance.selectableTroops[existingIndex].level}");
+        // }
+        // else
+        // {
+        //     // If troop doesn't exist, add it to selectable troops at level 1
+        //     TroopLevel newTroopLevel = new TroopLevel();
+        //     newTroopLevel.troopSO = troopSO;
+        //     newTroopLevel.level = 1;
+        //     
+        //     TroopManager.Instance.selectableTroops.Add(newTroopLevel);
+        //     
+        //     Debug.Log($"Added new troop to shop: {troopSO.name} at level 1");
+        // }
         
         // Refresh the troop cards in TroopManager to reflect the changes
         TroopManager.Instance.RefreshTroopCards();

@@ -12,21 +12,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d5074b98d1f47b9a196d2fc4f664f3c, type: 3}
   m_Name: Troop Swordsman
   m_EditorClassIdentifier: 
-  health: 120
-  damage: 40
+  health: 75
+  damage: 14
   defense: 2
   attackRange: 1
-  movementSpeed: 3
+  movementSpeed: 3.5
   speedCategory: NORMAL
-  attackCooldown: 1.5
-  spawnCooldown: 3
-  soulCost: 3
+  attackCooldown: 0.6
+  spawnCooldown: 2
+  soulCost: 2
   soulGainedWhenDefeated: 1
   projectilePrefab: {fileID: 0}
   projectileSpeed: 10
-  troopClass: 0
+  troopClass: 2
+  isMagic: 0
   name: SWORDSMAN
-  potrait: {fileID: -2982154035576548524, guid: f99824fe4baf14fafaaa844af15b3732, type: 3}
+  description: Cheap, fast melee fighters perfect for swarming.
+  potrait: {fileID: 2444409878323800028, guid: d0d01dd43973a4c4090943e2426b796c, type: 3}
   walkSound: {fileID: 8300000, guid: 3faf9124e537748d99ead1cb8d03ba6d, type: 3}
   hitSound: {fileID: 8300000, guid: 7fd4a0bb348c34d6b83e244087845ee7, type: 3}
   allyDeathSound: {fileID: 8300000, guid: d424b7eaa40aa4be9bad385bbadac7f0, type: 3}

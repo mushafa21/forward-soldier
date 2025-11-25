@@ -24,10 +24,13 @@ public class TroopSO : ScriptableObject
     public GameObject projectilePrefab;
     public float projectileSpeed = 10f;
     public TroopClass troopClass;
+    public bool isMagic;
 
 
     [Header("Presentation")] 
     public string name;
+    [TextArea(3, 10)]
+    public string description;
     public Sprite potrait;
     public AudioClip walkSound;
     public AudioClip hitSound;

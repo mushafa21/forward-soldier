@@ -8,7 +8,8 @@ namespace TroopSystem
         [Header("Projectile Settings")]
         public float speed = 10f;           // Speed at which the projectile moves
         public float lifetime = 5f;         // How long the projectile exists before being destroyed
-        public float damage = 20f;          // Damage dealt to target
+        public float damage = 20f;
+        public bool isMagic = false;// Damage dealt to target
         
         private Transform target;          // The target troop to move towards
         private Troop sourceTroop;         // The troop that fired this projectile
@@ -62,13 +63,18 @@ namespace TroopSystem
                     // Check that target troop is still alive
                     if (targetTroop.currentHealth > 0)
                     {
-                        targetTroop.TakeDamage(damage);
+                        // Check if the source troop is magic to ignore defense
+                        bool isMagicAttack = (sourceTroop != null && sourceTroop.troopStats != null &&
+                                              sourceTroop.troopStats.isMagic) || isMagic;
+                        targetTroop.TakeDamage(damage, isMagicAttack);
                     }
                 } else if (tower != null)
                 {
                     if (tower.currentHealth > 0)
                     {
-                        tower.TakeDamage(damage);
+                        // Check if the source troop is magic to ignore defense
+                        bool isMagicAttack = sourceTroop != null && sourceTroop.troopStats != null && sourceTroop.troopStats.isMagic;
+                        tower.TakeDamage(damage, isMagicAttack);
                     }
                 }
                 
