@@ -627,7 +627,7 @@ MonoBehaviour:
     - rid: 4596503409475977290
       type: {class: MMF_Image, ns: MoreMountains.Feedbacks, asm: MoreMountains.Tools}
       data:
-        Active: 1
+        Active: 0
         UniqueID: -1880806318
         Label: Image
         OriginalLabel: Image
@@ -1116,8 +1116,8 @@ MonoBehaviour:
   DelayedBarIncreasing: {fileID: 3653883731655905621}
   MinimumBarFillValue: 0
   MaximumBarFillValue: 1
-  SetInitialFillValueOnStart: 1
-  InitialFillValue: 1
+  SetInitialFillValueOnStart: 0
+  InitialFillValue: 0.028
   BarDirection: 0
   FillMode: 0
   TimeScale: 0

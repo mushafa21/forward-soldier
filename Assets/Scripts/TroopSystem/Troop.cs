@@ -114,7 +114,7 @@ namespace TroopSystem
         // Squash and stretch effect when taking damage
         private Vector3 originalScale; // Store the original scale to ensure proper reset after animations
         private Color originalSpriteColor = Color.white; // Store the original sprite color to restore after interruption
-
+        private Vector3 targetPosition;
         // Awake is called before Start
         void Awake()
         {
@@ -615,7 +615,7 @@ namespace TroopSystem
                     Vector3 targetWaypoint = currentPath.GetWaypoint(currentWaypointIndex);
 
                     // Move towards the target waypoint while preserving the Y offset
-                    Vector3 targetPosition = targetWaypoint;
+                    targetPosition = targetWaypoint;
                     targetPosition.y += yPositionOffset; // Add the Y offset to maintain visual stacking prevention
                     targetPosition.z += yPositionOffset * zOffsetPerYUnit; // Also preserve Z offset for depth
 
@@ -649,7 +649,7 @@ namespace TroopSystem
                     Vector3 targetWaypoint = currentPath.GetWaypoint(currentWaypointIndex);
 
                     // Move towards the target waypoint while preserving the Y offset
-                    Vector3 targetPosition = targetWaypoint;
+                    targetPosition = targetWaypoint;
                     targetPosition.y += yPositionOffset; // Add the Y offset to maintain visual stacking prevention
                     targetPosition.z += yPositionOffset * zOffsetPerYUnit; // Also preserve Z offset for depth
 
@@ -669,29 +669,23 @@ namespace TroopSystem
                         else
                         {
                             // Update scale based on the direction of the next movement
-                            UpdateScaleBasedOnDirection();
                         }
                     }
                 }
             }
+            UpdateScaleBasedOnDirection();
+
         }
 
         // Update the scale based on the direction of movement (x-axis)
         void UpdateScaleBasedOnDirection()
         {
-            if (currentPath == null || currentPath.waypoints.Count == 0) return;
-
-            Vector3 towerPosition;
-            if (faction == TroopFaction.Player)
+            if (targetPosition == null)
             {
-                towerPosition = LevelManager.Instance.enemyTower.transform.position;
-            }
-            else
-            {
-                towerPosition = LevelManager.Instance.playerTower.transform.position;
+                return;
             }
             // Flip based on x component of direction
-            if (towerPosition.x < transform.position.x) // Moving left (relative to tower)
+            if (targetPosition.x < transform.position.x) // Moving left (relative to tower)
             {
                 // Flip the x scale to face left
                 transform.localScale = new Vector3(-Mathf.Abs(originalScaleX), transform.localScale.y, transform.localScale.z);
@@ -703,7 +697,7 @@ namespace TroopSystem
 
                 hitParticle.GetComponent<ParticleSystemRenderer>().flip = new Vector3(1, 0, 0);
             }
-            else if (towerPosition.x > transform.position.x) // Moving right (relative to tower)
+            else if (targetPosition.x > transform.position.x) // Moving right (relative to tower)
             {
                 // Keep normal x scale to face right
                 transform.localScale = new Vector3(Mathf.Abs(originalScaleX), transform.localScale.y, transform.localScale.z);

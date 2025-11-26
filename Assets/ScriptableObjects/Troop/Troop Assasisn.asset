@@ -19,7 +19,7 @@ MonoBehaviour:
   movementSpeed: 5
   speedCategory: FAST
   attackCooldown: 0.2
-  spawnCooldown: 4
+  spawnCooldown: 2
   soulCost: 4
   soulGainedWhenDefeated: 1
   projectilePrefab: {fileID: 0}

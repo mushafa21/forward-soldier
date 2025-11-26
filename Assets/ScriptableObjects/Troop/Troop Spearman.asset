@@ -30,7 +30,7 @@ MonoBehaviour:
   description: A sturdy defender that blocks weak attacks with its defense.
   potrait: {fileID: 2162766994774161030, guid: f460a181875bc40769aba5bb027d5b07, type: 3}
   walkSound: {fileID: 8300000, guid: 3faf9124e537748d99ead1cb8d03ba6d, type: 3}
-  hitSound: {fileID: 8300000, guid: 7fd4a0bb348c34d6b83e244087845ee7, type: 3}
+  hitSound: {fileID: 8300000, guid: a6a343a48c59643f59210f1f4f2d8e82, type: 3}
   allyDeathSound: {fileID: 8300000, guid: 8911d6e4d811a48a385a0b7ceaf3d7bb, type: 3}
   enemyDeathSound: {fileID: 8300000, guid: 8911d6e4d811a48a385a0b7ceaf3d7bb, type: 3}
   hurtSound: {fileID: 8300000, guid: ebe00e58b3f6047e687eddb334ba7d5e, type: 3}

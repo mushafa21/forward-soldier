@@ -201,7 +201,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: NEW TROOP UNCLOCKED
+  m_text: NEW TROOP UNLOCKED
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: c4842a1f245a2479082127a8cb8bc777, type: 2}
   m_sharedMaterial: {fileID: -8093771879006049759, guid: c4842a1f245a2479082127a8cb8bc777, type: 2}
