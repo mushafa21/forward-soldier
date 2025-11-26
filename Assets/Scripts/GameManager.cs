@@ -17,11 +17,7 @@ public class GameManager : MonoBehaviour
     public GameObject playerHud;
     public GameObject troopContainer;
 
-    [Header("Transition Settings")]
-    public GameObject transitionCanvas; // Canvas for the transition effect
-    public UnityEngine.UI.Image transitionCircle; // Circle image for the wipe effect
-    public float transitionDuration = 1f; // Duration of the transition effect
-    
+
     // Tower upgrade level
     public int towerLevel = 1;
 
@@ -236,80 +232,47 @@ public class GameManager : MonoBehaviour
     // Coroutine for circle wipe transition effect
     private IEnumerator CircleWipeTransition(System.Action onComplete, bool skipReveal = false)
     {
-        if (transitionCanvas != null && transitionCircle != null)
-        {
-            // Make the transition canvas persist across scenes
-            DontDestroyOnLoad(transitionCanvas);
+        // Signal that transition is starting
+        TransitionManager.Instance.StartTransition();
 
+        if (TransitionManager.Instance.transitionCanvas != null && TransitionManager.Instance.transitionCircle != null)
+        {
             // Activate the transition canvas
-            transitionCanvas.SetActive(true);
+            TransitionManager.Instance.transitionCanvas.SetActive(true);
 
             // Start with a small circle at center to not hide anything initially
-            transitionCircle.rectTransform.localScale = Vector3.zero;
+            TransitionManager.Instance.transitionCircle.rectTransform.localScale = Vector3.zero;
 
             // Animate the circle expanding to cover the screen (wipe out current scene)
             float elapsedTime = 0f;
             Vector3 startScale = Vector3.zero;
             Vector3 endScale = Vector3.one * 30f; // Expand to cover everything
 
-            while (elapsedTime < transitionDuration * 0.5f) // Use half the duration for the wipe out
+            while (elapsedTime < TransitionManager.Instance.transitionDuration * 0.5f) // Use half the duration for the wipe out
             {
                 elapsedTime += Time.unscaledDeltaTime;
-                float progress = elapsedTime / (transitionDuration * 0.5f);
+                float progress = elapsedTime / (TransitionManager.Instance.transitionDuration * 0.5f);
 
                 // Use a custom easing for smooth expansion
                 float easedProgress = EaseOutCubic(progress);
 
-                transitionCircle.rectTransform.localScale = Vector3.Lerp(startScale, endScale, easedProgress);
+                TransitionManager.Instance.transitionCircle.rectTransform.localScale = Vector3.Lerp(startScale, endScale, easedProgress);
 
                 yield return null;
             }
 
             // Ensure the circle fully covers the screen
-            transitionCircle.rectTransform.localScale = endScale;
+            TransitionManager.Instance.transitionCircle.rectTransform.localScale = endScale;
         }
 
         // Execute the action (load the new scene)
         onComplete?.Invoke();
 
-        // Wait a moment to ensure scene loads
-        yield return new WaitForSeconds(0.05f);
+        // Wait briefly to ensure scene loads
+        yield return new WaitForSeconds(0.1f);
 
-        // Only perform the reverse animation if not skipping it
-        if (!skipReveal && transitionCanvas != null && transitionCircle != null)
-        {
-            // Start with the circle covering everything
-            transitionCircle.rectTransform.localScale = Vector3.one * 30f;
-
-            // Animate the circle shrinking to reveal the new scene
-            float elapsedTime = 0f;
-            Vector3 startScale = Vector3.one * 30f;
-            Vector3 endScale = Vector3.zero; // Shrink to nothing to reveal everything
-
-            while (elapsedTime < transitionDuration * 0.5f) // Use half the duration for the reveal
-            {
-                elapsedTime += Time.unscaledDeltaTime;
-                float progress = elapsedTime / (transitionDuration * 0.5f);
-
-                // Use a custom easing for smooth shrinking
-                float easedProgress = EaseOutCubic(progress);
-
-                transitionCircle.rectTransform.localScale = Vector3.Lerp(startScale, endScale, easedProgress);
-
-                yield return null;
-            }
-
-            // Ensure the circle is fully shrunk at the end
-            transitionCircle.rectTransform.localScale = endScale;
-
-            // Hide the transition canvas after the transition completes
-            transitionCanvas.SetActive(false);
-        }
-        else if (transitionCanvas != null)
-        {
-            // If we're skipping the reveal (e.g. for going to main menu), just hide the canvas
-            transitionCanvas.SetActive(false);
-        }
+        // End the transition after scene load
+        TransitionManager.Instance.EndTransition();
     }
 
     // Easing function for smooth animation

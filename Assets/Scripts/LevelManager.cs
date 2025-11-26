@@ -23,8 +23,8 @@ public class LevelManager : MonoBehaviour
     public GameObject playerTowerCamera;
     public GameObject enemyTowerCamera;
     public GameObject battleCamera;
-    public GameObject nextLevelWindow;
-    public CinemachineBrain cinemachineBrain;
+    public SlideInAnimator victorySlideIn;
+    public SlideInAnimator DefeatSlideIn;
 
     public GameObject victoryScreen;
     public UIButton continueButton;
@@ -260,6 +260,7 @@ public class LevelManager : MonoBehaviour
 
         // Show victory screen
         victoryScreen.SetActive(true);
+        victorySlideIn.ShowSlideIn();
         GameManager.Instance.IncreaseGold(1000);
     }
 
@@ -285,6 +286,8 @@ public class LevelManager : MonoBehaviour
 
         // Show game over screen
         deathScreen.SetActive(true);
+        DefeatSlideIn.ShowSlideIn();
+
     }
 
     private void RemoveAllTroops()

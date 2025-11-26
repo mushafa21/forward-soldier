@@ -613,19 +613,19 @@ namespace TroopSystem
                 if (currentWaypointIndex >= 0)
                 {
                     Vector3 targetWaypoint = currentPath.GetWaypoint(currentWaypointIndex);
-                    
+
                     // Move towards the target waypoint while preserving the Y offset
                     Vector3 targetPosition = targetWaypoint;
                     targetPosition.y += yPositionOffset; // Add the Y offset to maintain visual stacking prevention
                     targetPosition.z += yPositionOffset * zOffsetPerYUnit; // Also preserve Z offset for depth
 
                     transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
-                    
+
                     // Check if we've reached the waypoint (using the offset-adjusted position for distance check)
                     if (Vector3.Distance(transform.position, targetPosition) < 0.1f)
                     {
                         currentWaypointIndex--;
-                        
+
                         // If we've reached the first waypoint, we've reached the end (which is start of path for player)
                         if (currentWaypointIndex < 0)
                         {
@@ -638,7 +638,7 @@ namespace TroopSystem
                             UpdateScaleBasedOnDirection();
                         }
                     }
-                    
+
                 }
             }
             else
@@ -647,19 +647,19 @@ namespace TroopSystem
                 if (currentWaypointIndex < currentPath.GetWaypointCount())
                 {
                     Vector3 targetWaypoint = currentPath.GetWaypoint(currentWaypointIndex);
-                    
+
                     // Move towards the target waypoint while preserving the Y offset
                     Vector3 targetPosition = targetWaypoint;
                     targetPosition.y += yPositionOffset; // Add the Y offset to maintain visual stacking prevention
                     targetPosition.z += yPositionOffset * zOffsetPerYUnit; // Also preserve Z offset for depth
 
                     transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
-                    
+
                     // Check if we've reached the waypoint (using the offset-adjusted position for distance check)
                     if (Vector3.Distance(transform.position, targetPosition) < 0.1f)
                     {
                         currentWaypointIndex++;
-                        
+
                         // If we've reached the last waypoint, we've reached the end
                         if (currentWaypointIndex >= currentPath.GetWaypointCount())
                         {
@@ -681,39 +681,6 @@ namespace TroopSystem
         {
             if (currentPath == null || currentPath.waypoints.Count == 0) return;
 
-            // Vector3 direction = Vector3.zero;
-            //
-            // if (faction == TroopFaction.Enemy)
-            // {
-            //     // For enemy troops, we're going from higher index to lower index (end to start)
-            //     if (currentWaypointIndex >= 0 && currentWaypointIndex < currentPath.GetWaypointCount() - 1)
-            //     {
-            //         // Calculate direction from current index to previous index (moving backward)
-            //         direction = currentPath.GetWaypoint(currentWaypointIndex) - currentPath.GetWaypoint(currentWaypointIndex + 1);
-            //     }
-            //     else if (currentWaypointIndex == currentPath.GetWaypointCount() - 1 && currentPath.GetWaypointCount() > 1)
-            //     {
-            //         // At start of enemy path (but at the end of the waypoint array), 
-            //         // use direction from end of array to second to last
-            //         direction = currentPath.GetWaypoint(currentPath.GetWaypointCount() - 1) - 
-            //                     currentPath.GetWaypoint(currentPath.GetWaypointCount() - 2);
-            //     }
-            // }
-            // else
-            // {
-            //     // For player troops, we're going from lower index to higher index (start to end)
-            //     if (currentWaypointIndex > 0 && currentWaypointIndex < currentPath.GetWaypointCount())
-            //     {
-            //         // Calculate direction from current index to next index
-            //         direction = currentPath.GetWaypoint(currentWaypointIndex) - currentPath.GetWaypoint(currentWaypointIndex - 1);
-            //     }
-            //     else if (currentWaypointIndex == 0 && currentPath.GetWaypointCount() > 1)
-            //     {
-            //         // At start of normal path, use direction from first to second
-            //         direction = currentPath.GetWaypoint(1) - currentPath.GetWaypoint(0);
-            //     }
-            // }
-
             Vector3 towerPosition;
             if (faction == TroopFaction.Player)
             {
@@ -724,7 +691,7 @@ namespace TroopSystem
                 towerPosition = LevelManager.Instance.playerTower.transform.position;
             }
             // Flip based on x component of direction
-            if (towerPosition.x < transform.position.x) // Moving left
+            if (towerPosition.x < transform.position.x) // Moving left (relative to tower)
             {
                 // Flip the x scale to face left
                 transform.localScale = new Vector3(-Mathf.Abs(originalScaleX), transform.localScale.y, transform.localScale.z);
@@ -733,10 +700,10 @@ namespace TroopSystem
                     walkParticle.transform.localPosition = new Vector3(-Mathf.Abs(originalParticlePositionX),walkParticle.transform.localPosition.y, walkParticle.transform.localPosition.z);
                     walkParticle.transform.localScale = new Vector3(-Mathf.Abs(originalParticleScaleX), walkParticle.transform.localScale.y, walkParticle.transform.localScale.z);
                 }
-                
+
                 hitParticle.GetComponent<ParticleSystemRenderer>().flip = new Vector3(1, 0, 0);
             }
-            else if (towerPosition.x > transform.position.x) // Moving right
+            else if (towerPosition.x > transform.position.x) // Moving right (relative to tower)
             {
                 // Keep normal x scale to face right
                 transform.localScale = new Vector3(Mathf.Abs(originalScaleX), transform.localScale.y, transform.localScale.z);
@@ -749,6 +716,8 @@ namespace TroopSystem
 
             }
         }
+
+
 
         // Called when the troop reaches the end of its path
         void OnReachedPathEnd()
@@ -954,7 +923,7 @@ namespace TroopSystem
                     if (animator != null && animator.runtimeAnimatorController != null)
                     {
                         animator.SetBool("IsWalking", false);
-                        
+
                         // *** FIX 1: BETTER SPEED CALCULATION ***
                         // Only speed up if the cooldown is faster than the animation.
                         // Never slow down (no slow-motion for heavy units), just let them wait in Idle.
@@ -963,15 +932,15 @@ namespace TroopSystem
                         {
                              requiredSpeed = baseAttackAnimationLength / attackCooldown;
                         }
-                        
+
                         animator.speed = requiredSpeed;
                         animator.SetTrigger("Attack");
-                        
+
                         // *** FIX 2: IMPACT TIMING ***
                         // Calculate time based on the ADJUSTED speed
                         float adjustedDuration = baseAttackAnimationLength / requiredSpeed;
                         float timeToImpact = adjustedDuration * impactPointNormalized;
-                        
+
                         // Safety check
                         timeToImpact = Mathf.Max(timeToImpact, 0.05f);
 
@@ -1025,7 +994,7 @@ namespace TroopSystem
                 // Calculate how much animation is left after the impact
                 float adjustedTotalDuration = baseAttackAnimationLength / animator.speed;
                 float remainingAnimationTime = adjustedTotalDuration - (adjustedTotalDuration * impactPointNormalized);
-                
+
                 // If practically finished, switch now. Otherwise wait for animation to visually end.
                 if (remainingAnimationTime <= 0.02f)
                 {

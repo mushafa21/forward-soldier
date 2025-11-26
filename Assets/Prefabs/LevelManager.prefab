@@ -1,0 +1,70 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5114573894052853209
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8294107979674636128}
+  - component: {fileID: 7150327360441372186}
+  m_Layer: 0
+  m_Name: LevelManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8294107979674636128
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5114573894052853209}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 10.270209, y: -2.8610375, z: -0.0222}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7150327360441372186
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5114573894052853209}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2b95135814e460da6797dd802c5da52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerTowerCamera: {fileID: 0}
+  enemyTowerCamera: {fileID: 0}
+  battleCamera: {fileID: 0}
+  victorySlideIn: {fileID: 0}
+  DefeatSlideIn: {fileID: 0}
+  victoryScreen: {fileID: 0}
+  continueButton: {fileID: 0}
+  backToMenuButton: {fileID: 0}
+  resetButton: {fileID: 0}
+  deathScreen: {fileID: 0}
+  playerTower: {fileID: 0}
+  enemyTower: {fileID: 0}
+  victorySound: {fileID: 8300000, guid: a1209b9e6c3e346e5acfe36436d00e23, type: 3}
+  battleSound: {fileID: 8300000, guid: 28cebf32479894280aef7c652af48a4e, type: 3}
+  loseSound: {fileID: 8300000, guid: 011ddd76416144c15be5ef1623f99279, type: 3}
+  preparationSound: {fileID: 8300000, guid: c5f42cdd627c645e891e49e1a01725bd, type: 3}
+  hornSound: {fileID: 8300000, guid: d06de8ae8384e44879f79d5533e86a6c, type: 3}
+  boomSound: {fileID: 8300000, guid: a7d4e76cbd4bd4acdbf0fe82b4abc686, type: 3}
+  unlockedTroops:
+  - {fileID: 11400000, guid: 611dff7e1ef934cf99405690e4ed82a3, type: 2}
+  currentState: 0
+  battlePreparationUI: {fileID: 0}
+  countdownCanvas: {fileID: 0}
+  countdownText: {fileID: 0}

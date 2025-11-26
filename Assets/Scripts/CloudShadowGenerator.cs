@@ -13,6 +13,7 @@ public class CloudShadowGenerator : MonoBehaviour
     [Header("Y Position Settings")]
     public float minYPosition = 5f; // Minimum Y position for random placement
     public float maxYPosition = 10f; // Maximum Y position for random placement
+    public float minDistanceY = 2f; // Minimum vertical distance between clouds
 
     [Header("Spawn Area")]
     public float spawnMinX = -20f; // Leftmost spawn position
@@ -25,6 +26,7 @@ public class CloudShadowGenerator : MonoBehaviour
     private List<GameObject> activeClouds = new List<GameObject>();
     private Queue<GameObject> pooledClouds = new Queue<GameObject>();
     private float lastSpawnTime = 0f;
+    private Dictionary<GameObject, float> cloudYPositions = new Dictionary<GameObject, float>(); // Track Y position for each cloud
 
     void Start()
     {
@@ -74,14 +76,68 @@ public class CloudShadowGenerator : MonoBehaviour
             cloud = Instantiate(cloudPrefab, transform);
         }
 
-        // Set random X and Y position for the new cloud
+        // Set random X position for the new cloud
         float randomX = Random.Range(spawnMinX, spawnMaxX);
-        float randomY = Random.Range(minYPosition, maxYPosition);
+
+        // Generate a Y position that maintains minimum distance from recent clouds
+        float randomY = GenerateYPositionWithMinimumDistance();
+
         cloud.transform.position = new Vector3(randomX, randomY, transform.position.z);
 
-        // Add to active clouds list
+        // Add to active clouds list and track Y position
         activeClouds.Add(cloud);
+        cloudYPositions[cloud] = randomY;
+    }
 
+    // Method to generate a Y position that maintains minimum distance from recent clouds
+    float GenerateYPositionWithMinimumDistance()
+    {
+        // Get all currently active Y positions
+        List<float> activeYPositions = new List<float>();
+        foreach (var pair in cloudYPositions)
+        {
+            if (pair.Key != null) // Make sure the cloud object still exists
+            {
+                activeYPositions.Add(pair.Value);
+            }
+        }
+
+        // If no active Y positions, return a completely random Y position
+        if (activeYPositions.Count == 0)
+        {
+            return Random.Range(minYPosition, maxYPosition);
+        }
+
+        // Try multiple times to find a suitable Y position
+        int maxAttempts = 50; // Maximum attempts to find a valid Y position
+        int attempts = 0;
+
+        while (attempts < maxAttempts)
+        {
+            float candidateY = Random.Range(minYPosition, maxYPosition);
+
+            // Check if this Y position is far enough from all active positions
+            bool isValid = true;
+            for (int i = 0; i < activeYPositions.Count; i++)
+            {
+                if (Mathf.Abs(candidateY - activeYPositions[i]) < minDistanceY)
+                {
+                    isValid = false;
+                    break;
+                }
+            }
+
+            if (isValid)
+            {
+                return candidateY;
+            }
+
+            attempts++;
+        }
+
+        // If we couldn't find a suitable position after max attempts,
+        // return a random position to avoid getting stuck
+        return Random.Range(minYPosition, maxYPosition);
     }
 
     void MoveClouds()
@@ -109,13 +165,27 @@ public class CloudShadowGenerator : MonoBehaviour
                 // Check if the cloud has moved beyond the right boundary
                 if (cloud.transform.position.x > rightBoundary)
                 {
+                    // Remove the cloud's Y position from the dictionary before returning it to pool
+                    if (cloudYPositions.ContainsKey(cloud))
+                    {
+                        cloudYPositions.Remove(cloud);
+                    }
+
                     ReturnCloudToPool(cloud);
                     activeClouds.RemoveAt(i);
                 }
             }
             else
             {
-                // Remove null references from the list
+                // Remove null references from both collections
+                if (i < activeClouds.Count) // Double check the index is still valid
+                {
+                    GameObject nullCloud = activeClouds[i];
+                    if (cloudYPositions.ContainsKey(nullCloud))
+                    {
+                        cloudYPositions.Remove(nullCloud);
+                    }
+                }
                 activeClouds.RemoveAt(i);
             }
         }
@@ -162,6 +232,11 @@ public class CloudShadowGenerator : MonoBehaviour
                     DestroyImmediate(cloud);
             }
             activeClouds.Clear();
+        }
+
+        if (cloudYPositions != null)
+        {
+            cloudYPositions.Clear();
         }
     }
 
