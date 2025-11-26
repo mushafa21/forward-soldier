@@ -56,6 +56,9 @@ namespace TroopSystem
         public float minAttackSoundInterval = 0.35f; 
         private float lastAttackSoundTime = -1f;
         
+        public float minHurtSoundInterval = 0.5f; 
+        private float lastHurtSoundTime = -1f;
+        
         [Header("State Management")]
         public TroopState currentState = TroopState.Idle;
         
@@ -796,6 +799,7 @@ namespace TroopSystem
             }
 
             UpdateHealth();
+            PlayHurtSound();
         }
 
         private void UpdateHealth()
@@ -867,6 +871,39 @@ namespace TroopSystem
             }
         }
         
+        private void PlayHurtSound()
+        {
+            // 1. DUPLICATE CHECK: 
+            // You were calling both AudioManager AND local AudioSource. 
+            // I commented out AudioManager to prevent "echo/phasing" effects.
+            // AudioManager.Instance.PlaySFX(troopStats.hitSound); 
+
+            // 2. THROTTLING:
+            // If we played a sound very recently, skip this one.
+            // For Assassin (0.2s speed), this will play sound on Hit 1, Skip Hit 2, Play Hit 3.
+            // This sounds much cleaner.
+            if (Time.time - lastHurtSoundTime < minHurtSoundInterval)
+            {
+                return;
+            }
+
+            if (audioSource != null && troopStats != null && troopStats.hurtSound != null)
+            {
+                // Stop any looping sounds (like walk sound) before playing attack sound
+                audioSource.loop = false;
+                
+                // 3. PITCH VARIATION:
+                // Randomize pitch slightly (0.9 to 1.1) so it doesn't sound like a robot machine gun.
+                audioSource.pitch = Random.Range(0.9f, 1.1f);
+                
+                // Set the attack sound clip and play it once
+                audioSource.PlayOneShot(troopStats.hurtSound);
+                
+                // Mark the time
+                lastHurtSoundTime = Time.time;
+            }
+        }
+
         private void PlayDeathSound()
         {
 
@@ -1135,8 +1172,8 @@ namespace TroopSystem
             transform.DOKill();
 
             // Calculate a slight squash and stretch effect using the stored original scale
-            Vector3 targetSquashScale = new Vector3(originalScale.x * 0.9f, originalScale.y * 1.1f, originalScale.z); // Squash horizontally, stretch vertically
-            Vector3 targetStretchScale = new Vector3(originalScale.x * 1.1f, originalScale.y * 0.9f, originalScale.z); // Stretch horizontally, squash vertically
+            Vector3 targetSquashScale = new Vector3(originalScale.x * 0.8f, originalScale.y * 1.2f, originalScale.z); // Squash horizontally, stretch vertically
+            Vector3 targetStretchScale = new Vector3(originalScale.x * 1.2f, originalScale.y * 0.8f, originalScale.z); // Stretch horizontally, squash vertically
 
             // Apply the effect with DOTween (squash first, then return to original)
             // First, do a quick squash

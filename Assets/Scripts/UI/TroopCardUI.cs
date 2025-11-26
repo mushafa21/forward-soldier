@@ -8,8 +8,7 @@ using UnityEngine.EventSystems;
 
 public class TroopCardUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    [Header("References")]
-    public Button button;
+    [Header("References")] public Button button;
     public Image troopPotrait;
     public Image troopClass;
     public TextMeshProUGUI troopName;
@@ -22,11 +21,10 @@ public class TroopCardUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     public TextMeshProUGUI coolDownText;
     public Image coolDownImage;
     public Image disabledImage;
-    public TextMeshProUGUI healthText,attactText,defenseText,speedText,levelText;
+    public TextMeshProUGUI healthText, attactText, defenseText, speedText, levelText;
     public int currentLevel = 1;
 
-    [Header("Remove Button")]
-    public Button removeButton; // Button to remove this troop from the shop
+    [Header("Remove Button")] public Button removeButton; // Button to remove this troop from the shop
 
     public bool isSelected = false;
     public bool isInCooldown = false;
@@ -68,7 +66,6 @@ public class TroopCardUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         // print("_isInBattlePreparation = " + _isInBattlePreparation);
         // print("_battlePrepUI = " + _battlePrepUI);
         // print("_isSelectedInBattlePrep = " + _isSelectedInBattlePrep);
-
     }
 
     public void SetTroop(TroopSO troop, int level)
@@ -98,7 +95,11 @@ public class TroopCardUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     // Method to update the disabled image based on context
     public void UpdateDisabledImage()
     {
-        if (troopSO != null && disabledImage != null)
+        if (_isShopItem)
+        {
+            disabledImage.gameObject.SetActive(false);
+        }
+        else if (troopSO != null && disabledImage != null)
         {
             if (!_isInBattlePreparation)
             {
@@ -164,7 +165,6 @@ public class TroopCardUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
             print("Select Troop Called");
             TroopManager.Instance.SetCurrentTroop(this);
         }
-
     }
 
     void InitTroop()
@@ -178,53 +178,53 @@ public class TroopCardUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         speedText.text = troopSO.speedCategory;
         levelText.text = "LVL " + currentLevel;
         troopName.text = troopSO.name;
-        troopDescription.text = troopSO.description;
+        troopDescription.text = troopSO.description.ToUpper();
         troopAttackSpeed.text = troopSO.attackCooldown + "s";
     }
 
     public void StartCooldown()
     {
         if (troopSO == null) return;
-        
+
         isInCooldown = true;
         coolDownImage.fillAmount = 1f; // Start with full fill
         coolDownImage.gameObject.SetActive(true);
-        
+
         // Start the cooldown coroutine
         StartCoroutine(CooldownRoutine(troopSO.spawnCooldown));
     }
-    
+
     private System.Collections.IEnumerator CooldownRoutine(float duration)
     {
         float elapsed = 0f;
-        
+
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
             float progress = 1f - (elapsed / duration); // Decreases from 1 to 0
             coolDownImage.fillAmount = progress;
-            
+
             // Update cooldown text
             int secondsRemaining = Mathf.CeilToInt(duration - elapsed);
             coolDownText.text = secondsRemaining.ToString();
             coolDownText.gameObject.SetActive(true);
-            
+
             yield return null;
         }
-        
+
         // Cooldown finished
         isInCooldown = false;
         coolDownImage.gameObject.SetActive(false);
         coolDownText.gameObject.SetActive(false);
     }
-    
+
     public void Select()
     {
         isSelected = true;
         if (selectedIndicator != null)
             selectedIndicator.SetActive(true);
     }
-    
+
     public void Deselect()
     {
         isSelected = false;
@@ -249,10 +249,9 @@ public class TroopCardUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         {
             isShowingStats = false;
             statsObject.GetComponent<SlideInAnimator>().HideSlideOut();
-
         }
     }
-    
+
     void RemoveTroop()
     {
         // Remove this troop from the TroopManager's selectable troops

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using MoreMountains.Tools;
 using UnityEngine;
 using PathSystem;
@@ -39,7 +40,7 @@ namespace TowerSystem
         public Renderer towerRenderer;
         public Color playerColor = Color.blue;
         public Color enemyColor = Color.red;
-        public SpriteRenderer mageSprite;
+        public List<SpriteRenderer> troopSprites;
         public Material factionMaterial; // Assign your 'Troop_ColorSwap_Material' here
         public Material flagMaterial; // Assign your 'Troop_ColorSwap_Material' here
         public SpriteRenderer flagSprite1;
@@ -47,11 +48,19 @@ namespace TowerSystem
 
         public ParticleSystem hitParticle;
         public ParticleSystem destroyParticle;
+        public AudioClip hitSound;
+        public AudioClip destroySound;
+
+        
+        private AudioSource audioSource;
+        public float minHurtSoundInterval = 0.5f; 
+        private float lastHurtSoundTime = -1f;
 
         private Vector3 originalScale; // Store the original scale to ensure proper reset after animations
 
         void Start()
         {
+            audioSource = GetComponent<AudioSource>();
             currentHealth = maxHealth;
             SetFactionColor();
             UpdateUI();
@@ -80,6 +89,27 @@ namespace TowerSystem
             }
             hitParticle.Play();
 
+            if (Time.time - lastHurtSoundTime < minHurtSoundInterval)
+            {
+                return;
+            }
+
+            if (audioSource != null)
+            {
+                // Stop any looping sounds (like walk sound) before playing attack sound
+                audioSource.loop = false;
+                
+                // 3. PITCH VARIATION:
+                // Randomize pitch slightly (0.9 to 1.1) so it doesn't sound like a robot machine gun.
+                audioSource.pitch = Random.Range(0.9f, 1.1f);
+                
+                // Set the attack sound clip and play it once
+                audioSource.PlayOneShot(hitSound);
+                
+                // Mark the time
+                lastHurtSoundTime = Time.time;
+            }
+
             // Apply squash and stretch effect when taking damage
             ApplySquashAndStretch();
         }
@@ -87,6 +117,7 @@ namespace TowerSystem
         // Called when the tower is destroyed
         void OnTowerDestroyed()
         {
+            AudioManager.Instance.PlaySFX(destroySound);
             destroyParticle.Play();
             if (faction == TowerFaction.Player)
             {
@@ -105,12 +136,12 @@ namespace TowerSystem
         // Set the color based on faction
         void SetFactionColor()
         {
-            if (mageSprite == null || factionMaterial == null)
-            {
-                if (mageSprite == null) Debug.LogWarning($"SpriteRenderer not assigned on {gameObject.name}");
-                if (factionMaterial == null) Debug.LogWarning($"FactionMaterial not assigned on {gameObject.name}");
-                return;
-            }
+            // if (mageSprite == null || factionMaterial == null)
+            // {
+            //     if (mageSprite == null) Debug.LogWarning($"SpriteRenderer not assigned on {gameObject.name}");
+            //     if (factionMaterial == null) Debug.LogWarning($"FactionMaterial not assigned on {gameObject.name}");
+            //     return;
+            // }
 
             // Create a new instance of the material for this troop
             // This is CRUCIAL so that changing one troop's color
@@ -118,14 +149,16 @@ namespace TowerSystem
             Material materialInstance = new Material(factionMaterial);
             
             // Set the sprite renderer to use this new material instance
-            mageSprite.material = materialInstance;
+            // mageSprite.material = materialInstance;
+            troopSprites.ForEach(sprite => sprite.material = materialInstance);
+
 
             // Set the '_TargetColor' property on the shader
             if (faction == TowerFaction.Enemy)
             {
         
                 materialInstance.SetColor("_TargetColor", enemyColor);
-                mageSprite.gameObject.transform.localScale = new Vector3(mageSprite.gameObject.transform.localScale.x * -1, mageSprite.gameObject.transform.localScale.y, mageSprite.gameObject.transform.localScale.z);
+                // mageSprite.gameObject.transform.localScale = new Vector3(mageSprite.gameObject.transform.localScale.x * -1, mageSprite.gameObject.transform.localScale.y, mageSprite.gameObject.transform.localScale.z);
                 towerRenderer.gameObject.transform.localScale = new Vector3(towerRenderer.gameObject.transform.localScale.x * -1, towerRenderer.gameObject.transform.localScale.y, towerRenderer.gameObject.transform.localScale.z);
 
             }

@@ -45,7 +45,7 @@ public class EnemyCardUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
             defenseText.text = enemySO.GetDefenseAtLevel(1).ToString("F0"); // Using level 1 for enemy defense display
             speedText.text = enemySO.speedCategory;
             attackSpeedText.text = enemySO.attackCooldown + "s"; // Add attack speed
-            descriptionText.text = enemySO.description;
+            descriptionText.text = enemySO.description.ToUpper();
             enemyName.text = enemySO.name;
         }
     }
@@ -56,6 +56,7 @@ public class EnemyCardUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         {
             isShowingStats = true;
             statsObject.SetActive(true);
+            statsObject.GetComponent<SlideInAnimator>().ShowSlideIn();
         }
     }
 
@@ -65,6 +66,7 @@ public class EnemyCardUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         {
             isShowingStats = false;
             statsObject.GetComponent<SlideInAnimator>().HideSlideOut();
+
         }
     }
 }

@@ -9,6 +9,7 @@ using TowerSystem;
 using UnityEngine;
 using UnityEngine.UI;
 using TroopSystem;
+using Unity.Cinemachine;
 
 
 public enum LevelState
@@ -19,19 +20,29 @@ public enum LevelState
 
 public class LevelManager : MonoBehaviour
 {
-    public GameObject introCamera;
+    public GameObject playerTowerCamera;
+    public GameObject enemyTowerCamera;
     public GameObject battleCamera;
+    public GameObject nextLevelWindow;
+    public CinemachineBrain cinemachineBrain;
 
     public GameObject victoryScreen;
     public UIButton continueButton;
     public UIButton backToMenuButton;
+    public UIButton resetButton;
 
     public GameObject deathScreen;
     public Tower playerTower;
     public Tower enemyTower;
-    // public AudioClip victorySound;
+    public AudioClip victorySound;
     public AudioClip battleSound;
-    // public AudioClip loseSound;
+    public AudioClip loseSound;
+    public AudioClip preparationSound;
+    public AudioClip hornSound;
+    public AudioClip boomSound;
+
+    public List<TroopSO> unlockedTroops = new List<TroopSO>();
+
 
     private static LevelManager instance;
     public LevelState currentState = LevelState.preparation;
@@ -46,6 +57,10 @@ public class LevelManager : MonoBehaviour
 
     [Header("Battle Preparation")]
     public BattlePreparationUI battlePreparationUI;  // Reference to BattlePreparationUI
+
+    [Header("Countdown UI")]
+    public GameObject countdownCanvas;  // Canvas for the countdown text
+    public TMPro.TextMeshProUGUI countdownText;  // Text for the countdown
 
     private bool isBattleStarted = false;  // Flag to track if battle has started
 
@@ -66,16 +81,28 @@ public class LevelManager : MonoBehaviour
         Time.timeScale = 1;
         GameManager.Instance.playerHud.SetActive(true);
         GameManager.Instance.UpdateGold();
-        AudioManager.Instance.PlayMusic(battleSound);
+        AudioManager.Instance.PlayMusic(preparationSound);
         GameManager.Instance.UpdateStateText();
         GameManager.Instance.ApplyEnemyLevelChanges();
+        battleCamera.gameObject.SetActive(false);
+        resetButton.onClick.AddListener(ResetLevel);
 
+        UIManager.Instance.HideHUD();
+  
         // Start battle preparation sequence instead of directly starting battle
         StartCoroutine(BattlePreparationSequence());
+        GameManager.Instance.unlockedTroops = unlockedTroops;
+    }
+
+    private void ResetLevel()
+    {
+        GameManager.Instance.RestartLevel();
     }
 
     private IEnumerator BattlePreparationSequence()
     {
+        yield return new WaitForSeconds(0.5f);
+
         // Turn on battle camera first
         if (battleCamera != null)
         {
@@ -84,6 +111,8 @@ public class LevelManager : MonoBehaviour
 
         // Pause for 2 seconds
         yield return new WaitForSeconds(2f);
+        UIManager.Instance.ShowHUD();
+
 
         // Show the BattlePreparationUI canvas
         if (battlePreparationUI != null)
@@ -101,6 +130,59 @@ public class LevelManager : MonoBehaviour
     {
         if (isBattleStarted) return;  // Prevent multiple starts
 
+        // Hide the battle preparation UI first
+        battlePreparationUI.HideBattlePreparation();
+
+        // Start the countdown sequence
+        StartCoroutine(CountdownSequence());
+    }
+
+    // Coroutine for the countdown sequence
+    private IEnumerator CountdownSequence()
+    {
+        if (countdownCanvas != null)
+        {
+            countdownCanvas.SetActive(true);  // Show the countdown canvas
+        }
+
+        // Show READY
+        if (countdownText != null)
+        {
+            countdownText.text = "READY";
+        }
+        AudioManager.Instance.PlaySFX(boomSound);
+        yield return new WaitForSeconds(1f);
+
+        // Show SET
+        if (countdownText != null)
+        {
+            countdownText.text = "SET";
+        }
+        AudioManager.Instance.PlaySFX(boomSound);
+        yield return new WaitForSeconds(1f);
+
+        // Show FORWARD!
+        if (countdownText != null)
+        {
+            countdownText.text = "FORWARD!";
+        }
+        AudioManager.Instance.PlaySFX(hornSound);
+
+        yield return new WaitForSeconds(1f);
+
+        // Hide the countdown canvas and start the actual battle
+        if (countdownCanvas != null)
+        {
+            countdownCanvas.SetActive(false);
+        }
+
+        // Start the actual battle
+        StartBattleProcess();
+    }
+
+    // Method that handles the actual battle start process
+    private void StartBattleProcess()
+    {
         currentState = LevelState.battle;
         isBattleStarted = true;
 
@@ -115,6 +197,8 @@ public class LevelManager : MonoBehaviour
         {
             TroopManager.Instance.StartBattle(); // Use the new StartBattle method instead of just enabling
         }
+        AudioManager.Instance.PlayMusic(battleSound);
+
     }
 
     private void OnEnable()
@@ -141,20 +225,6 @@ public class LevelManager : MonoBehaviour
         GameManager.Instance.GoToMainMenu();
     }
 
-    public void ShowVictoryScreen()
-    {
-        Time.timeScale = 0;
-        victoryScreen.SetActive(true);
-        GameManager.Instance.IncreaseGold(1000);
-
-    }
-
-    public void ShowGameOverScreen()
-    {
-        Time.timeScale = 0;
-        deathScreen.SetActive(true);
-
-    }
 
     public void StartVictorySequence()
     {
@@ -172,12 +242,23 @@ public class LevelManager : MonoBehaviour
     {
         // Remove all troops from the scene
         RemoveAllTroops();
+        AudioManager.Instance.PlayMusic(victorySound);
+
+        UIManager.Instance.HideHUD();
+
+        // // Set the Cinemachine blend speed to 0.5 seconds
+        // if (cinemachineBrain != null)
+        // {
+        //     cinemachineBrain.m_DefaultBlend.Duration = 0.5f;
+        // }
+
+        enemyTowerCamera.SetActive(true);
 
         // Wait 1 second before showing the victory screen
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(1.5f);
+        Time.timeScale = 0;
 
         // Show victory screen
-        Time.timeScale = 0;
         victoryScreen.SetActive(true);
         GameManager.Instance.IncreaseGold(1000);
     }
@@ -186,12 +267,23 @@ public class LevelManager : MonoBehaviour
     {
         // Remove all troops from the scene
         RemoveAllTroops();
+        AudioManager.Instance.PlayMusic(loseSound);
+        UIManager.Instance.HideHUD();
+
+        // // Set the Cinemachine blend speed to 0.5 seconds
+        // if (cinemachineBrain != null)
+        // {
+        //     cinemachineBrain.m_DefaultBlend.Duration = 0.5f;
+        // }
+
+        playerTowerCamera.SetActive(false);
+        playerTowerCamera.SetActive(true);
 
         // Wait 1 second before showing the game over screen
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(1.5f);
+        Time.timeScale = 0;
 
         // Show game over screen
-        Time.timeScale = 0;
         deathScreen.SetActive(true);
     }
 

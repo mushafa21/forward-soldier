@@ -24,6 +24,7 @@ public class EnemyManager : MonoBehaviour
 
     private bool isInitialized = false;
     private bool isBattlePreparationPhase = true; // Initially in battle preparation
+    private TroopSO currentTargetTroop = null; // The troop currently targeted for spawning
 
     private static EnemyManager instance;
     public static EnemyManager Instance
@@ -59,6 +60,9 @@ public class EnemyManager : MonoBehaviour
         currentSouls = 0f; // Start with 0 souls
         isInitialized = true;
 
+        // Select a random troop as the current target
+        SelectRandomTroop();
+
         // Start the enemy logic coroutines (they will check battle phase internally)
         StartCoroutine(SoulRegenCoroutine());
         StartCoroutine(EnemyActionCoroutine());
@@ -91,24 +95,20 @@ public class EnemyManager : MonoBehaviour
 
     private void PerformEnemyAction()
     {
-        if (spawnableTroops.Count == 0 || spawnPaths.Count == 0)
+        if (spawnableTroops.Count == 0 || spawnPaths.Count == 0 || currentTargetTroop == null)
         {
             return; // Can't do anything if there are no troops or paths to spawn
         }
 
-        // Try to spawn a troop randomly if possible
-        TrySpawnRandomTroop();
-    }
-
-    private void TrySpawnRandomTroop()
-    {
-        if (spawnableTroops.Count == 0)
+        // 20% chance to skip spawning this decision
+        if (Random.Range(0f, 1f) < 0.2f)
+        {
+            Debug.Log("Enemy skipped spawning this decision cycle");
             return;
+        }
 
-        // Find a valid troop to spawn based on available souls
-        TroopSO troopToSpawn = GetAffordableTroop();
-
-        if (troopToSpawn != null && currentSouls >= troopToSpawn.soulCost)
+        // Check if the current target troop can be spawned (has enough souls)
+        if (currentSouls >= currentTargetTroop.soulCost)
         {
             // Select a random path
             LanePath selectedPath = spawnPaths[Random.Range(0, spawnPaths.Count)];
@@ -118,30 +118,26 @@ public class EnemyManager : MonoBehaviour
             int troopSpawnLevel = 1 + enemyLevel; // Default to level 1, plus enemy level
 
             // Spawn the troop at the selected path
-            SpawnTroop(troopToSpawn, selectedPath, troopSpawnLevel);
+            SpawnTroop(currentTargetTroop, selectedPath, troopSpawnLevel);
+
+            // After spawning, select a new random troop
+            SelectRandomTroop();
         }
-        // If no affordable troop is found, the enemy will wait until it has more souls
+        // If not enough souls, do nothing and wait for next decision
     }
 
-    private TroopSO GetAffordableTroop()
+    private void SelectRandomTroop()
     {
-        List<TroopSO> affordableTroops = new List<TroopSO>();
-
-        foreach (TroopSO troopSO in spawnableTroops)
+        if (spawnableTroops.Count > 0)
         {
-            if (currentSouls >= troopSO.soulCost)
-            {
-                affordableTroops.Add(troopSO);
-            }
+            currentTargetTroop = spawnableTroops[Random.Range(0, spawnableTroops.Count)];
+            Debug.Log($"Enemy selected new target troop: {currentTargetTroop.name} (Cost: {currentTargetTroop.soulCost})");
         }
-
-        if (affordableTroops.Count > 0)
+        else
         {
-            // Return a random affordable troop
-            return affordableTroops[Random.Range(0, affordableTroops.Count)];
+            currentTargetTroop = null;
+            Debug.LogWarning("No spawnable troops available!");
         }
-
-        return null; // No affordable troops
     }
 
     public void SpawnTroop(TroopSO troopSO, LanePath path, int level)

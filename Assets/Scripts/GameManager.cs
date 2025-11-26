@@ -16,6 +16,11 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI stageText;
     public GameObject playerHud;
     public GameObject troopContainer;
+
+    [Header("Transition Settings")]
+    public GameObject transitionCanvas; // Canvas for the transition effect
+    public UnityEngine.UI.Image transitionCircle; // Circle image for the wipe effect
+    public float transitionDuration = 1f; // Duration of the transition effect
     
     // Tower upgrade level
     public int towerLevel = 1;
@@ -48,7 +53,7 @@ public class GameManager : MonoBehaviour
         if (instance == null)
         {
             instance = this;
-            DontDestroyOnLoad(gameObject);
+            // DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -106,8 +111,7 @@ public class GameManager : MonoBehaviour
         towerLevel = 1;
         soulUpgradeLevel = 1;
         currentStage = 1;
-        StartCoroutine(LoadLevelWithDelay(levelScenes[currentLevelIndex]));
-
+        StartCoroutine(CircleWipeTransition(() => StartCoroutine(LoadLevelWithDelay(levelScenes[currentLevelIndex])), false));
     }
 
     public void UpdateStateText()
@@ -117,29 +121,29 @@ public class GameManager : MonoBehaviour
     
     public void GoToNextLevel()
     {
-        SceneManager.UnloadScene("ShopScene");
+        // SceneManager.UnloadScene("ShopScene");
         currentStage++;
         if (levelScenes == null || levelScenes.Count == 0)
         {
             Debug.LogWarning("No level scenes defined in GameManager!");
             return;
         }
-        
+
         // Check if there's a next level
         if (currentLevelIndex < levelScenes.Count - 1)
         {
             currentLevelIndex++;
-            StartCoroutine(LoadLevelWithDelay(levelScenes[currentLevelIndex]));
+            StartCoroutine(CircleWipeTransition(() => StartCoroutine(LoadLevelWithDelay(levelScenes[currentLevelIndex])), false));
         }
         else
         {
             // All levels completed - increase enemy level and repeat the last level
             enemyLevel++;
             Debug.Log($"All levels completed! Enemy level increased to {enemyLevel}. Repeating level {levelScenes[currentLevelIndex]} with increased difficulty.");
-            
+
             // Load the same level again but with increased enemy difficulty
-            StartCoroutine(LoadLevelWithDelay(levelScenes[currentLevelIndex]));
-            
+            StartCoroutine(CircleWipeTransition(() => StartCoroutine(LoadLevelWithDelay(levelScenes[currentLevelIndex])), false));
+
         }
     }
     
@@ -194,7 +198,7 @@ public class GameManager : MonoBehaviour
 
     public void GoToMainMenu()
     {
-        SceneManager.LoadScene("MainMenuScene");
+        StartCoroutine(CircleWipeTransition(() => SceneManager.LoadScene("MainMenuScene"), true));
     }
     
     public int GetCurrentLevelIndex()
@@ -216,8 +220,102 @@ public class GameManager : MonoBehaviour
         return levelScenes != null ? levelScenes.Count : 0;
     }
 
+    public void RestartLevel()
+    {
+        StartCoroutine(CircleWipeTransition(() => {
+            // Reload the current active scene
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }));
+    }
+
     public void OpenShop()
     {
         SceneManager.LoadScene("ShopScene", LoadSceneMode.Additive);
+    }
+
+    // Coroutine for circle wipe transition effect
+    private IEnumerator CircleWipeTransition(System.Action onComplete, bool skipReveal = false)
+    {
+        if (transitionCanvas != null && transitionCircle != null)
+        {
+            // Make the transition canvas persist across scenes
+            DontDestroyOnLoad(transitionCanvas);
+
+            // Activate the transition canvas
+            transitionCanvas.SetActive(true);
+
+            // Start with a small circle at center to not hide anything initially
+            transitionCircle.rectTransform.localScale = Vector3.zero;
+
+            // Animate the circle expanding to cover the screen (wipe out current scene)
+            float elapsedTime = 0f;
+            Vector3 startScale = Vector3.zero;
+            Vector3 endScale = Vector3.one * 30f; // Expand to cover everything
+
+            while (elapsedTime < transitionDuration * 0.5f) // Use half the duration for the wipe out
+            {
+                elapsedTime += Time.unscaledDeltaTime;
+                float progress = elapsedTime / (transitionDuration * 0.5f);
+
+                // Use a custom easing for smooth expansion
+                float easedProgress = EaseOutCubic(progress);
+
+                transitionCircle.rectTransform.localScale = Vector3.Lerp(startScale, endScale, easedProgress);
+
+                yield return null;
+            }
+
+            // Ensure the circle fully covers the screen
+            transitionCircle.rectTransform.localScale = endScale;
+        }
+
+        // Execute the action (load the new scene)
+        onComplete?.Invoke();
+
+        // Wait a moment to ensure scene loads
+        yield return new WaitForSeconds(0.05f);
+
+        // Only perform the reverse animation if not skipping it
+        if (!skipReveal && transitionCanvas != null && transitionCircle != null)
+        {
+            // Start with the circle covering everything
+            transitionCircle.rectTransform.localScale = Vector3.one * 30f;
+
+            // Animate the circle shrinking to reveal the new scene
+            float elapsedTime = 0f;
+            Vector3 startScale = Vector3.one * 30f;
+            Vector3 endScale = Vector3.zero; // Shrink to nothing to reveal everything
+
+            while (elapsedTime < transitionDuration * 0.5f) // Use half the duration for the reveal
+            {
+                elapsedTime += Time.unscaledDeltaTime;
+                float progress = elapsedTime / (transitionDuration * 0.5f);
+
+                // Use a custom easing for smooth shrinking
+                float easedProgress = EaseOutCubic(progress);
+
+                transitionCircle.rectTransform.localScale = Vector3.Lerp(startScale, endScale, easedProgress);
+
+                yield return null;
+            }
+
+            // Ensure the circle is fully shrunk at the end
+            transitionCircle.rectTransform.localScale = endScale;
+
+            // Hide the transition canvas after the transition completes
+            transitionCanvas.SetActive(false);
+        }
+        else if (transitionCanvas != null)
+        {
+            // If we're skipping the reveal (e.g. for going to main menu), just hide the canvas
+            transitionCanvas.SetActive(false);
+        }
+    }
+
+    // Easing function for smooth animation
+    private float EaseOutCubic(float t)
+    {
+        t = Mathf.Clamp01(t);
+        return 1f - Mathf.Pow(1f - t, 3);
     }
 }

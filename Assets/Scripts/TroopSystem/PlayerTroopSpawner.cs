@@ -140,7 +140,8 @@ namespace TroopSystem
 
                 if (spawnEffect != null)
                 {
-                    Instantiate(spawnEffect, transform);
+                    GameObject  spawnGO = Instantiate(spawnEffect);
+                    spawnGO.transform.position = transform.position;
                 }
             }
             else

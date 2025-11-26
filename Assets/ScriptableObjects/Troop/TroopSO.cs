@@ -36,6 +36,8 @@ public class TroopSO : ScriptableObject
     public AudioClip hitSound;
     public AudioClip allyDeathSound;
     public AudioClip enemyDeathSound;
+    public AudioClip hurtSound;
+
     public AnimatorOverrideController animatorController;
 
     // Method to calculate stats for a specific level

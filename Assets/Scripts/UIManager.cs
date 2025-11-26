@@ -11,7 +11,10 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI soulText;
     public MMProgressBar soulBar;
     public Slider intervalSlider; // Slider for soul generation interval
-
+    public GameObject hud;
+    public GameObject troopListContainer;
+    public GameObject soulContainer;
+    public GameObject levelStageContainer;
 
     private static UIManager instance;
 
@@ -29,7 +32,7 @@ public class UIManager : MonoBehaviour
         if (instance == null)
         {
             instance = this;
-            DontDestroyOnLoad(gameObject);
+            // DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -52,5 +55,19 @@ public class UIManager : MonoBehaviour
             float normalizedValue = max > 0 ? Mathf.Clamp01(current / max) : 0;
             intervalSlider.value = normalizedValue;
         }
+    }
+
+    public void HideHUD()
+    {
+        hud.SetActive(false);
+    }
+
+    public void ShowHUD()
+    {
+        hud.SetActive(true);
+        troopListContainer.GetComponent<SlideInAnimator>().ShowSlideIn();
+        soulContainer.GetComponent<SlideInAnimator>().ShowSlideIn();
+        levelStageContainer.GetComponent<SlideInAnimator>().ShowSlideIn();
+        
     }
 }

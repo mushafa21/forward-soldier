@@ -135,7 +135,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &19577610
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -151,14 +151,10 @@ MonoBehaviour:
   activeTroops: []
   maxSelectableTroops: 5
   selectableTroops:
-  - level: 1
-    troopSO: {fileID: 11400000, guid: 32c4ebd08d3e84b1c8d4fe286b573e1b, type: 2}
-  - level: 1
-    troopSO: {fileID: 11400000, guid: b7060474bf1f44ce9a45d05dcb78839e, type: 2}
-  - level: 1
-    troopSO: {fileID: 11400000, guid: 8a7cba5d3afdc476d843697cdf0b844d, type: 2}
-  - level: 1
-    troopSO: {fileID: 11400000, guid: d6ef937b36daf40acb0b4e3e3bc2e863, type: 2}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   troopCardPrefab: {fileID: 6044060424830333802, guid: 1ca47b67be2614bc4b333e6a650cf4c0, type: 3}
   currentSelectedTroop: {fileID: 0}
 --- !u!4 &19577611
@@ -51794,6 +51790,10 @@ PrefabInstance:
     - target: {fileID: 1602567470057215831, guid: ef2134d76b59b4ebca0660d813590b5b, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -50
+      objectReference: {fileID: 0}
+    - target: {fileID: 1816007340506273953, guid: ef2134d76b59b4ebca0660d813590b5b, type: 3}
+      propertyPath: transitionDuration
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3360863954651018675, guid: ef2134d76b59b4ebca0660d813590b5b, type: 3}
       propertyPath: m_AnchorMax.y

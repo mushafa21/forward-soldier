@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   health: 200
   damage: 50
+  defense: 0
   attackRange: 1
   movementSpeed: 3
   speedCategory: NORMAL
@@ -23,10 +24,14 @@ MonoBehaviour:
   soulGainedWhenDefeated: 2
   projectilePrefab: {fileID: 0}
   projectileSpeed: 0
+  troopClass: 0
+  isMagic: 0
   name: LIGHTNING WARRIOR
+  description: 
   potrait: {fileID: 6315784868803468625, guid: 7aade0054ee51472495142f5c237ab04, type: 3}
   walkSound: {fileID: 8300000, guid: 3faf9124e537748d99ead1cb8d03ba6d, type: 3}
   hitSound: {fileID: 8300000, guid: 7fd4a0bb348c34d6b83e244087845ee7, type: 3}
-  allyDeathSound: {fileID: 8300000, guid: d424b7eaa40aa4be9bad385bbadac7f0, type: 3}
-  enemyDeathSound: {fileID: 8300000, guid: 421a7129338a844718e6b445cba3a448, type: 3}
+  allyDeathSound: {fileID: 8300000, guid: 8911d6e4d811a48a385a0b7ceaf3d7bb, type: 3}
+  enemyDeathSound: {fileID: 8300000, guid: 8911d6e4d811a48a385a0b7ceaf3d7bb, type: 3}
+  hurtSound: {fileID: 8300000, guid: ebe00e58b3f6047e687eddb334ba7d5e, type: 3}
   animatorController: {fileID: 22100000, guid: 4818a13a33f214b26bb57827ecf701e4, type: 2}

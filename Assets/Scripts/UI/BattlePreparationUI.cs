@@ -10,7 +10,9 @@ public class BattlePreparationUI : MonoBehaviour
     public Transform troopContainer;  // Container for available TroopCardUI
     public Transform selectedTroopContainer; // Container for selected TroopCardUI
     public UIButton startButton;  // Button to start the battle
-    public Canvas battlePreparationCanvas;  // The canvas for battle preparation
+    public Canvas battlePreparationCanvas;
+    public GameObject troopWindow;
+    public GameObject enemyWindow;// The canvas for battle preparation
 
     [Header("Prefabs")]
     public EnemyCardUI enemyCardPrefab;  // Prefab for EnemyCardUI
@@ -125,6 +127,9 @@ public class BattlePreparationUI : MonoBehaviour
             battlePreparationCanvas.enabled = true;
         }
         gameObject.SetActive(true);
+        troopWindow.GetComponent<SlideInAnimator>().ShowSlideIn();
+        enemyWindow.GetComponent<SlideInAnimator>().ShowSlideIn();
+
     }
 
     public void HideBattlePreparation()
@@ -138,14 +143,18 @@ public class BattlePreparationUI : MonoBehaviour
 
     private void StartBattle()
     {
-        // Before hiding the UI, update the TroopManager with selected troops
-        UpdateTroopManagerWithSelectedTroops();
+        if (selectedTroops.Count > 0)
+        {
+            // Before hiding the UI, update the TroopManager with selected troops
+            UpdateTroopManagerWithSelectedTroops();
 
-        // Hide the battle preparation UI
-        HideBattlePreparation();
+            // Hide the battle preparation UI
+            HideBattlePreparation();
 
-        // Start the actual battle by calling GameManager or BattleManager
-        LevelManager.Instance.StartActualBattle();
+            // Start the actual battle by calling GameManager or BattleManager
+            LevelManager.Instance.StartActualBattle();
+        }
+   
     }
 
     // Update TroopManager with selected troops
@@ -185,6 +194,7 @@ public class BattlePreparationUI : MonoBehaviour
             //     troopCard.disabledImage.gameObject.SetActive(true);
             // }
 
+            AudioManager.Instance.PlayButtonClickSound();
             // Remove from available troops
             availableTroops.Remove(troopCard);
 
@@ -215,6 +225,7 @@ public class BattlePreparationUI : MonoBehaviour
             // }
 
             // Add back to available troops
+            AudioManager.Instance.PlayButtonClickSound();
             availableTroops.Add(troopCard);
 
             // Move the troop card back to the available container
